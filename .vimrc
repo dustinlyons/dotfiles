@@ -1,8 +1,10 @@
 "" --------------------------------------------------------------------------------
-"" VIM configuration
+"" Dustin's VIM configuration
+""
+"" Include this in ~/.vimrc:
+""   :so ~/src/dotfiles/.vimrc 
+""
 "" --------------------------------------------------------------------------------
-"" Dustin Lyons
-
 "" Color scheme
 colorscheme lucius 
 
