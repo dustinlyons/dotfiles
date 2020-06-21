@@ -7,6 +7,7 @@
 "" --------------------------------------------------------------------------------
 "" Color scheme
 colorscheme lucius 
+LuciusDark
 
 "" General
 set number
