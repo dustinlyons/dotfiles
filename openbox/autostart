@@ -11,7 +11,7 @@ nvidia-settings --assign CurrentMetaMode="nvidia-auto-select +0+0 { ForceFullCom
 exec thunar --daemon &
 
 ## Feh wallpaper
-feh --no-fehbg --bg-scale $(shuf -n1 -e /home/dustin/images/active/*) 
+feh --no-fehbg --bg-scale $(shuf -n1 -e /home/dustin/images/wallpaper/active/*) 
 
 ## Notification Daemon
 exec dunst &
