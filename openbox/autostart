@@ -16,7 +16,11 @@ feh --no-fehbg --bg-scale $(shuf -n1 -e /home/dustin/images/wallpaper/active/*)
 ## Notification Daemon
 exec dunst &
 
+## Notepads on desktop
 xpad & 
+
+## Turn on le screensaver
+xscreensaver -no-splash &
 
 ## Start Compositing Manager
 picom --xrender-sync-fence --backend xrender --config=/home/dustin/.config/picom/picom.conf
