@@ -230,6 +230,11 @@
         <command>~/.config/polybar/launch.sh</command>
       </action>
     </keybind>
+    <keybind key="C-A-Delete">
+      <action name="Execute">
+        <command>xscreensaver-command -activate</command>
+      </action>
+    </keybind>
     <keybind key="A-F1">
       <action name="Execute">
         <startupnotify>
