@@ -82,7 +82,7 @@ interval = 1800
 [module/coronavirus]
 type=custom/script
 exec = corona
-click-left = firefox https://www.cdc.gov/covid-data-tracker/#cases
+click-left = firefox https://www.statnews.com/feature/coronavirus/covid-19-tracker/ 
 format = ☣ <label>
 format-margin = 8
 interval = 900
