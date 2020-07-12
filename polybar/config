@@ -81,7 +81,7 @@ interval = 1800
 ; CORONAVIRUS
 [module/coronavirus]
 type=custom/script
-exec = python ~/code/coronapy/corona.py
+exec = corona
 click-left = firefox https://www.cdc.gov/covid-data-tracker/#cases
 format = ☣ <label>
 format-margin = 8
