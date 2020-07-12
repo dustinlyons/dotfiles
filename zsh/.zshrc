@@ -15,6 +15,7 @@ alias t=todo.sh
 alias w='todo.sh -d ~/.todo/work_config'
 alias notes='cd ~/docs/inbox ; vim'
 alias tmux=tmux -f /home/dustin/.tmux/tmux.conf
+alias ss=switchsink
 
 # See https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
 ZSH_THEME="robbyrussell"
