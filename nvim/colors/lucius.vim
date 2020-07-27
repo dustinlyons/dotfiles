@@ -115,7 +115,7 @@ if g:lucius_style == "dark"
 
     " == UI ==
     hi Pmenu        guifg=bg        guibg=#b2b2b2   ctermfg=NONE   ctermbg=233       gui=none      cterm=none
-    hi PmenuSel     guifg=fg        guibg=#005f87   ctermfg=fg     ctermbg=24        gui=none      cterm=none
+    hi PmenuSel     guifg=fg        guibg=#005f87   ctermfg=fg     ctermbg=239        gui=none      cterm=none
     hi PmenuSbar    guifg=#b2b2b2   guibg=#d0d0d0   ctermfg=249    ctermbg=252       gui=none      cterm=none
     hi PmenuThumb   guifg=fg        guibg=#808080   ctermfg=fg     ctermbg=244       gui=none      cterm=none
     hi StatusLine   guifg=bg        guibg=#b2b2b2   ctermfg=NONE   ctermbg=NONE       gui=bold      cterm=bold

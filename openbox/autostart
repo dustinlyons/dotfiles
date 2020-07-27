@@ -10,8 +10,11 @@ nvidia-settings --assign CurrentMetaMode="nvidia-auto-select +0+0 { ForceFullCom
 ## Thunar Daemon
 exec thunar --daemon &
 
+## Start Dropbox syncing
+dropboxd &
+
 ## Feh wallpaper
-feh --no-fehbg --bg-scale $(shuf -n1 -e /home/dustin/images/wallpaper/active/*) 
+feh --no-fehbg --bg-scale $(shuf -n1 -e /home/dustin/img/wallpaper/active/*) 
 
 ## Notification Daemon
 exec dunst &
