@@ -34,7 +34,7 @@ set noswapfile
 set relativenumber
 set rnu
 
-"" Whitespace
+"" Whitespace rules
 set tabstop=8
 set shiftwidth=4
 set softtabstop=4
@@ -68,10 +68,6 @@ xnoremap <Leader>. "+y
 nnoremap j gj
 nnoremap k gk
 
-"" Map CTRL-TAB to move through tabbed windows (like a browser)
-noremap <c-tab> :tabnext<cr>
-noremap <c-A-tab> :tabnext<cr>
-
 "" Map leader-q to quit out of window
 nnoremap <leader>q :q<cr>
 
@@ -89,7 +85,8 @@ nnoremap <silent> <Leader>gv :tabnew<CR>:e ~/dotfiles/.vimrc<CR>
 nnoremap <silent> <Leader>sv :so ~/dotfiles/.vimrc<CR>
 
 "" Move buffers
-nnoremap <Tab> :bnext<cr>
+nnoremap <tab> :bnext<cr>
+nnoremap <S-tab> :bprev<cr>
 
 "" Clears search buffer so highlighting is gone
 nmap <silent> ,/ :nohlsearch<CR>
@@ -112,44 +109,35 @@ if has('gui_running')
 endif
 
 "" --------------------------------------------------------------------------------
-"" Development plugins
+"" Sessions
+"" --------------------------------------------------------------------------------
+
+let g:sessions_dir = '/home/dustin/.local/share/nvim/session'
+"" Save a session
+exec 'nnoremap <Leader>ss :mks! ' . g:sessions_dir . '/'
+"" Restore a session
+exec 'nnoremap <Leader>sr :so ' . g:sessions_dir . '/'
+
+"" --------------------------------------------------------------------------------
+"" Plugins
 "" --------------------------------------------------------------------------------
 "" call plug#begin('~/.vim/plugged')
 
 " Source COC configs
-""source $HOME/.config/nvim/plug-config/coc.vim
-
 call plug#begin('~/.config/nvim/plugged')
 
-"Plug 'ncm2/ncm2'
-"Plug 'ncm2/ncm2-jedi'
-"Plug 'roxma/nvim-yarp'
+Plug 'neoclide/coc.nvim', {'branch': 'release'}
+source $HOME/.config/nvim/plug-config/coc.vim
 
-" enable ncm2 for all buffers
-"autocmd BufEnter * call ncm2#enable_for_buffer()
-"
-
-"set completeopt=noinsert,menuone,noselect
-
-" our wiki page for a list of sources: https://github.com/ncm2/ncm2/wiki
-"Plug 'ncm2/ncm2-bufword'
-"Plug 'ncm2/ncm2-path'
+"" --------------------------------------------------------------------------------
+"" Python
+"" --------------------------------------------------------------------------------
 
 "" Autocompletion and syntax highlighting
 Plug 'davidhalter/jedi-vim'
-"Plug 'tweekmonster/impsort.vim'
 Plug 'vim-syntastic/syntastic'
 
 let python_highlight_all=1
-
-" Disable Jedi-vim autocompletion and enable call-signatures options
-"let g:jedi#auto_initialization = 0
-"let g:jedi#completions_enabled = 0
-"let g:jedi#auto_vim_configuration = 0
-"let g:jedi#smart_auto_mappings = 0
-"let g:jedi#popup_on_dot = 0
-"let g:jedi#completions_command = ""
-"let g:jedi#show_call_signatures = "1"
 
 set statusline+=%#warningmsg#
 set statusline+=%{SyntasticStatuslineFlag()}
@@ -157,17 +145,26 @@ set statusline+=%*
 
 let g:syntastic_always_populate_loc_list = 1
 let g:syntastic_auto_loc_list = 1
-let g:syntastic_check_on_open = 1
-let g:syntastic_check_on_wq = 0
-"let g:syntastic_python_checks = ['pylint', 'jedi']
+let g:syntastic_check_on_open = 0
+let g:syntastic_check_on_wq = 1
+let g:syntastic_python_checks = ['pylint', 'jedi']
 let g:syntastic_python_pylint_args = "--load-plugins pylint_flask_sqlalchemy"
-let g:python3_host_prog='/home/dustin/code/sweeply_bot/venv/bin/python'
+let g:python3_host_prog='/home/dustin/code/sweeply/venv/bin/python'
 
 "" Fuzzy search
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 Plug 'junegunn/fzf.vim'
 nnoremap <leader>f :Files<CR>
 nnoremap <localleader>f :enew<CR>
+
+"" No more python whitespace formatting
+"" #Plug 'Chiel92/vim-autoformat'
+"" Autoformat on write
+"" au BufWrite * :Autoformat
+
+"" --------------------------------------------------------------------------------
+"" General
+"" --------------------------------------------------------------------------------
 
 "" Buffer bar at the top of screen
 Plug 'ap/vim-buftabline'
@@ -177,9 +174,6 @@ Plug 'freitass/todo.txt-vim'
 
 "" Cool start screen
 Plug 'mhinz/vim-startify'
-nnoremap <leader>s :SSave<CR>
-nnoremap <leader>c :SClose<CR>
-nnoremap <leader>d :SDelete<CR>
 
 let g:startify_lists = [
             \ { 'type': 'dir',       'header': ['   Current Directory '. getcwd()] },
@@ -204,10 +198,5 @@ let g:airline_powerline_fonts = 1
 
 "" Tmux + Vim love
 Plug 'christoomey/vim-tmux-navigator'
-
-"" No more python whitespace formatting
-Plug 'Chiel92/vim-autoformat'
-"" Autoformat on write
-au BufWrite * :Autoformat
 
 call plug#end()
