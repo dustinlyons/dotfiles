@@ -1,15 +1,16 @@
-# If you come from bash you might have to change your $PATH.
-export PATH=$HOME/bin:$HOME/.local/bin:$PATH
+# Dustin's .zshrc configuration
 
-# Path to your oh-my-zsh installation.
+export PATH=$HOME/bin:$HOME/.local/bin:$PATH
 export ZSH="/home/dustin/.oh-my-zsh"
 export EDITOR="/usr/bin/nvim"
 export TODOTXT_DEFAULT_ACTION="ls"
 export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git'
 export PIPENV_VERBOSITY=-1
+# Don't dirty up the place with __pycache__ files
 export PYTHONDONTWRITEBYTECODE=True
+# Tells less not to paginate if less than a page
+export LESS="-F -X $LESS" 
 
-# My aliases
 alias vim=nvim # visual vim, should I switch to neo?
 alias vi=nvim # visual vim, should I switch to neo?
 alias open='thunar . > /dev/null 2>&1' # open thunar where we are
