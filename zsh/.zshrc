@@ -9,7 +9,8 @@ export PIPENV_VERBOSITY=-1
 # Don't dirty up the place with __pycache__ files
 export PYTHONDONTWRITEBYTECODE=True
 # Tells less not to paginate if less than a page
-export LESS="-F -X $LESS" 
+export LESS="-eirMX"
+export LD_LIBRARY_PATH=/usr/local/lib
 
 alias vim=nvim # visual vim, should I switch to neo?
 alias vi=nvim # visual vim, should I switch to neo?
