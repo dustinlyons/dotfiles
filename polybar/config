@@ -51,8 +51,9 @@ font-4=FontAwesome5Brands:size=11;1
 font-5=font\-logos:size=10;2
 font-6=FreeSerif:style=Regular:size=14
 
-modules-right = spotify pulseaudio time powermenu
-modules-left = workspaces todo updates
+modules-left = pulseaudio popup-calendar
+modules-center = updates spotify
+modules-right = athens workspaces powermenu
 
 ;                      _       _           
 ;  _ __ ___   ___   __| |_   _| | ___  ___ 
@@ -76,6 +77,13 @@ format =   <label> update(s) available.
 format-margin = 8
 tail = true
 interval = 1800
+
+; POP UP CALENDAR
+[module/popup-calendar]
+type = custom/script
+exec = ~/code/scripts/popup-calendar.sh
+interval = 5
+click-left = ~/code/scripts/popup-calendar.sh --popup &
 
 ; CORONAVIRUS
 [module/coronavirus]
@@ -124,10 +132,10 @@ label-active-underline = ${colors.foreground}
 label-urgent-underline = ${colors.foreground}
 label-occupied-underline =${colors.foreground}
 
-; TODO
-[module/todo]
+; ATHENS
+[module/athens]
 type=custom/text
-content = ☑
+content = Y
 content-margin = 4
 click-left=alacritty -e nvim ~/docs/todo/personal.todo.txt ~/docs/todo/work.todo.txt &
 
