@@ -15,15 +15,14 @@ export LD_LIBRARY_PATH=/usr/local/lib
 alias vim=nvim # visual vim, should I switch to neo?
 alias vi=nvim # visual vim, should I switch to neo?
 alias open='thunar . > /dev/null 2>&1' # open thunar where we are
-alias t=todo.sh
-alias w='todo.sh -d ~/.todo/work_config'
 alias tmux=tmux -f /home/dustin/.tmux/tmux.conf
-alias ss=switchsink
+alias ss=switchsink # move between speakers and headphones
 alias pylint=pylint --load-plugins pylint_flask_sqlalchemy
 alias act='source venv/bin/activate'
 alias up='docker-compose up --force-recreate --detach'
 alias up='docker-compose up --force-recreate --detach'
 alias down='docker-compose down'
+alias poly='killall -9 polybar; polybar -r bar &!' # if polybar misbehaves
 
 # See https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
 ZSH_THEME="robbyrussell"
