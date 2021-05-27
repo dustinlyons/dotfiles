@@ -1,10 +1,15 @@
 env:
   term: alacritty
 
+background_opacity: 1.0
+
+cursor:
+  style: Block
+
 window:
   padding:
-    x: 4 
-    y: 4 
+    x: 8 
+    y: 8 
   dynamic_padding: true
   decorations: full
   title: Alacritty
@@ -45,6 +50,3 @@ colors:
     magenta: '0xc594c5'
     cyan:    '0x5fb3b3'
     white:   '0xd8dee9'
-
-cursor:
-  style: Block
