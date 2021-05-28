@@ -137,7 +137,7 @@ label-occupied-underline =${colors.foreground}
 type=custom/text
 content = Y
 content-margin = 4
-click-left=athens
+click-left = "~/code/scripts/athens"
 
 ; TIME
 [module/time]
