@@ -37,6 +37,9 @@ alias vi=nvim
 export EDITOR="/usr/bin/nvim"
 export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git'
 
+# Play WoW in linux
+alias wow='lutris rungame/battlenet &!'
+
 # Load terminal
 plugins=(git)
 source $ZSH/oh-my-zsh.sh
