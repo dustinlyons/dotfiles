@@ -147,7 +147,6 @@ label-active-padding = 2
 
 label-active-underline = #FAC863
 label-urgent-underline = ${colors.foreground}
-label-occupied-underline = ${colors.foreground}
 
 ; ATHENS
 [module/athens]
