@@ -20,7 +20,7 @@
   </placement>
   <theme>
     <name>Numix-Felix</name>
-    <titleLayout>NL</titleLayout>
+    <titleLayout>NLC</titleLayout>
     <keepBorder>yes</keepBorder>
     <animateIconify>yes</animateIconify>
     <font place="ActiveWindow">
@@ -61,15 +61,17 @@
     </font>
   </theme>
   <desktops>
-    <number>4</number>
+    <number>6</number>
     <firstdesk>0</firstdesk>
     <names>
-      <name>1</name>
-      <name>2</name>
-      <name>3</name>
-      <name>4</name>
+      <name>Coding</name>
+      <name>Scratch</name>
+      <name>Finance</name>
+      <name>Games</name>
+      <name>Email &amp; Calendar</name>
+      <name>Writing</name>
     </names>
-    <popupTime>0</popupTime>
+    <popupTime>875</popupTime>
   </desktops>
   <resize>
     <drawContents>yes</drawContents>
