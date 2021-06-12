@@ -153,7 +153,7 @@ label-urgent-underline = ${colors.foreground}
 type=custom/text
 content = 
 content-margin = 0
-click-left = "~/code/scripts/athens"
+click-left = "~/bin/roam"
 
 ; TIME
 [module/time]
