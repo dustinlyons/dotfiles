@@ -13,9 +13,6 @@ ntpdate -u us.pool.ntp.org
 ## Thunar Daemon
 exec thunar --daemon &
 
-## Start Dropbox syncing
-dropboxd &
-
 ## Feh wallpaper
 feh --no-fehbg --bg-scale $(shuf -n1 -e /home/dustin/img/wallpaper/active/*)
 
@@ -30,4 +27,3 @@ xscreensaver -no-splash &
 
 ## Start Compositing Manager
 picom --xrender-sync-fence --backend xrender --config=/home/dustin/.config/picom/picom.conf
-
