@@ -12,10 +12,25 @@
 ##############################
 # Error handling, interrupts 
 ##############################
+set -o errexit
+set -o nounset
+set -o pipefail
 
-source ./init.sh
+# Bash error function
+function handle_error() {
+        echo "Oops! Something went wrong."
+        exit 1
+}
+
+function handle_exit() {
+        exit 0
+}
+
+# Always grab these signals and route them to my exit func
+trap handle_error SIGHUP SIGINT SIGQUIT SIGABRT SIGTERM
+trap handle_exit 0 EXIT
+
 echo "Starting private setup..."
-
 ##############################
 # Install homebrew
 ##############################
