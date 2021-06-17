@@ -27,10 +27,19 @@ if test ! $(which brew); then
   ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
 fi
 
-PACKAGSE=(
+PACKAGES=(
+	ctags
 	htop
 	jq
+	fd
+	flac
+	mas
+	ngrep
+	node
+	neovim
+	watch
 )
+
 # Update homebrew recipes
 echo "Updating homebrew..."
 brew update
@@ -55,6 +64,7 @@ APPS=(
 	brave-browser
 	discord
 	docker
+	google-chrome
 	iterm2
 	hiddenbar
 	notion
@@ -70,13 +80,10 @@ APPS=(
 
 # Install apps to /Applications
 # Default is: /Users/$user/Applications
-echo "installing apps with Cask..."
+echo "Installing apps..."
 brew cask install --appdir="/Applications" ${apps[@]}
 
-brew cask alfred link
-
 brew cask cleanup
-brew cleanup
 brew cleanup
 
 ##############################
