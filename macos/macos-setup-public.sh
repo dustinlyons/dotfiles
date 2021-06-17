@@ -1,37 +1,24 @@
 #!/bin/zsh
-# Dustin's Apple macOS setup
-# Public script to bootstrap before my git repos
+# Dustin's macOS setup scripts
+# 
+# This is the "public" side of my macOS setup that
+# handles key creation, git setup, and downloading of
+# my private dotfiles to continue setup.
+#
+# I intend to upgrade Macs over the next several years. 
+# These scripts will ensure I do not lose important 
+# workflow optimizations.
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# Bash script initialization
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+##############################
+# Error handling, interrupts 
+##############################
 
-# Exit as soon as any nonzero code is found
-# Examples: undefined variables, failed pipes, etc.
-set -o errexit
-set -o nounset
-set -o pipefail
+source ./init.sh
+echo "Starting public setup..."
 
-# Bash error function
-function handle_error() {
-	echo "Oops! Something went wrong. Cleaning up..."
-	rm -rf ~/tmp
-	exit 1
-}
-
-function handle_exit() {
-	exit 0
-}
-
-# Always grab these signals and route them to my exit func
-trap handle_error SIGHUP SIGINT SIGQUIT SIGABRT SIGTERM
-trap handle_exit 0 EXIT
-
-echo "Starting setup..."
-
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+##############################
 # Install Xcode CLI tools
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+##############################
 
 if [ ! -d "/Library/Developer/CommandLineTools" ] 
 then
@@ -46,9 +33,9 @@ then
 	exit 1
 fi
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# Create a new SSH key
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+##############################
+# Create new SSH key
+##############################
 
 if [ ! -d ".ssh" ]
 then
@@ -66,9 +53,9 @@ else
 
 fi
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+##############################
 # Download my dotfiles
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+##############################
 
 if [ ! -d "tmp" ] 
 then
@@ -91,8 +78,8 @@ else
 	git pull origin master
 fi
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+##############################
 # Source the rest 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+##############################
 
 [ -f "macos/macos-setup-private.sh" ] && source macos/macos-setup-private.sh
