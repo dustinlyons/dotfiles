@@ -10,6 +10,11 @@
 # workflow optimizations.
 
 ##############################
+# Variables
+##############################
+export HOME_DIR=/Users/dustin
+
+##############################
 # Error handling, interrupts 
 ##############################
 set -o errexit
@@ -37,9 +42,17 @@ echo "Starting private setup..."
 
 # Check for Homebrew,
 # Install if we don't have it
-if test ! $(which brew); then
+if [ ! -e "$(which brew)" ]; then
   echo "Installing homebrew..."
-  ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+  echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> $HOME_DIR/.zprofile
+  eval "$(/opt/homebrew/bin/brew shellenv)"
+fi
+if [ -e "$(which brew)" ]; then
+  echo "... installed."
+else
+  echo "Failed to install homebrew, exiting..."
+  exit 1
 fi
 
 PACKAGES=(
@@ -67,6 +80,8 @@ echo "Configuring git..."
 git config --global user.name "Dustin Lyons"
 git config --global user.email hello@dustinlyons.co
 
+brew install ${PACKAGES[@]}
+
 ##############################
 # Install apps
 ##############################
@@ -74,7 +89,6 @@ git config --global user.email hello@dustinlyons.co
 # Apps
 APPS=(
 	1password
-	1password-cli
 	appcleaner
 	brave-browser
 	discord
@@ -89,16 +103,15 @@ APPS=(
 	rocket
 	spotify
 	telegram
-	transmission
+	homebrew/cask/transmission
 	vlc
 )
 
 # Install apps to /Applications
 # Default is: /Users/$user/Applications
 echo "Installing apps..."
-brew cask install --appdir="/Applications" ${apps[@]}
+brew install --force --appdir="/Applications" ${APPS[@]}
 
-brew cask cleanup
 brew cleanup
 
 ##############################
