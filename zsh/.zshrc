@@ -4,9 +4,11 @@
 export PATH=$HOME/bin:$HOME/.local/bin:$PATH
 export LD_LIBRARY_PATH=/usr/local/lib
 export ZSH="/home/dustin/.oh-my-zsh"
-ZSH_THEME="cloud" # See https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
-MODE_INDICATOR="%F{yellow}+%f"
-VI_MODE_RESET_PROMPT_ON_MODE_CHANGE=true
+
+# Oh-my-zsh init
+export ZSH_THEME="robbyrussell" # See https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
+export MODE_INDICATOR="%F{yellow}+%f"
+export VI_MODE_RESET_PROMPT_ON_MODE_CHANGE=true
 
 # Opens dir in UI
 alias open='thunar . > /dev/null 2>&1' # open thunar where we are
@@ -42,7 +44,8 @@ export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git'
 # Play WoW in linux
 alias wow='lutris rungame/battlenet &!'
 
-alias shot=scrot '%Y-%m-%d_$wx$h.png' -se 'mv $f ~/images/screenshots/'
+# Take screenshots easily
+alias shot=scrot -s '%Y-%m-%d_$wx$h.png' --exec 'mv $f ~/images/screenshots/'
 
 # Load terminal
 plugins=(
