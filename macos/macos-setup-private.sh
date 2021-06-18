@@ -105,7 +105,6 @@ brew install ${PACKAGES[@]}
 
 # Apps
 APPS=(
-	1password
 	appcleaner
 	brave-browser
 	discord
