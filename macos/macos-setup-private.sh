@@ -12,7 +12,15 @@
 ##############################
 # Variables
 ##############################
+export FULL_NAME="Dustin Lyons"
+export EMAIL="hello@dustinlyons.co"
+export APPLE_ID=me@dustinlyons.co
 export HOME_DIR=/Users/dustin
+export DRAFTS_APP_ID=1435957248
+export HARVEST_APP_ID=506189836
+export HIDDEN_BAR_APP_ID=1452453066
+export ONEPASSWORD_APP_ID=1333542190
+export INSTAPAPER_APP_ID=288545208
 
 ##############################
 # Error handling, interrupts 
@@ -21,9 +29,19 @@ set -o errexit
 set -o nounset
 set -o pipefail
 
-# Bash error function
+# Progress spinner
+spinner() {
+    local i sp n
+    sp='/-\|'
+    n=${#sp}
+    printf ' '
+    while sleep 0.1; do
+        printf "%s\b" "${sp:i++%n:1}"
+    done
+}
+# Zsh error function
 function handle_error() {
-        echo "Oops! Something went wrong."
+	echo -e "\e[1;31mOops! Something went wrong.\e[0m"
         exit 1
 }
 
@@ -35,23 +53,21 @@ function handle_exit() {
 trap handle_error SIGHUP SIGINT SIGQUIT SIGABRT SIGTERM
 trap handle_exit 0 EXIT
 
-echo "Starting private setup..."
+echo -e "\e[1;32mStarting private setup...\e[0m"
 ##############################
 # Install homebrew
 ##############################
 
-# Check for Homebrew,
-# Install if we don't have it
+# Check for Homebrew,install if we don't have it
 if [ ! -e "$(which brew)" ]; then
-  echo "Installing homebrew..."
-  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+  echo -e "\e[1;32mInstalling homebrew...\e[0m"
+  /bin/bash -c \
+  "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
   echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> $HOME_DIR/.zprofile
   eval "$(/opt/homebrew/bin/brew shellenv)"
 fi
-if [ -e "$(which brew)" ]; then
-  echo "... installed."
-else
-  echo "Failed to install homebrew, exiting..."
+if [ ! -e "$(which brew)" ]; then
+  echo -e "\e[1;31mFailed to install homebrew, exiting...\e[0m"
   exit 1
 fi
 
@@ -69,17 +85,18 @@ PACKAGES=(
 )
 
 # Update homebrew recipes
-echo "Updating homebrew..."
+echo -e "\e[1;32mUpdating homebrew...\e[0m"
 brew update
 
-echo "Installing Git..."
+echo -e "\e[1;32mInstalling git...\e[0m"
 brew install git
 
-echo "Configuring git..."
+echo -e "\e[1;32mConfiguring git...\e[0m"
 
-git config --global user.name "Dustin Lyons"
-git config --global user.email hello@dustinlyons.co
+git config --global user.name $FULL_NAME
+git config --global user.email $EMAIL
 
+echo -e "\e[1;32mInstalling homebrew packages...\e[0m"
 brew install ${PACKAGES[@]}
 
 ##############################
@@ -95,7 +112,6 @@ APPS=(
 	docker
 	google-chrome
 	iterm2
-	hiddenbar
 	notion
 	ngrok
 	kap
@@ -109,11 +125,36 @@ APPS=(
 
 # Install apps to /Applications
 # Default is: /Users/$user/Applications
-echo "Installing apps..."
+echo -e "\e[1;32mInstalling homebrew apps...\e[0m"
 brew install --force --appdir="/Applications" ${APPS[@]}
-
 brew cleanup
 
 ##############################
-# Misc settings
+# Mac app store
 ##############################
+# mas signin $APPLE_ID
+# Error: The 'signin' command has been disabled on this macOS version.
+# For more info see: https://github.com/mas-cli/mas/issues/164
+echo -e "\e[1;33mPlese open the Mac App Store and login\e[0m"
+echo -e "\e[1;33mPress [Enter] key when ready...\e[0m"
+echo -e "\e[1;33m...\e[0m"
+read
+
+echo -e "\e[1;32mInstalling Mac App Store apps...\e[0m"
+mas install $DRAFTS_APP_ID
+mas install $HARVEST_APP_ID
+mas install $HIDDEN_BAR_APP_ID
+mas install $ONEPASSWORD_APP_ID
+mas install $INSTAPAPER_APP_ID
+
+##############################
+# Defaults prefs
+##############################
+
+echo -e "\e[1;32mSetting security defaults...\e[0m"
+# Turn off the "Are you sure you want to open this?" warnings
+defaults write com.apple.LaunchServices LSQuarantine -bool NO
+
+echo -e "\e[1;32mComplete, rebooting finder...\e[0m"
+# Enable settings
+killall Finder
