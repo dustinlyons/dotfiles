@@ -64,3 +64,10 @@ span[data-link-title^="Person/"] .rm-page-ref::before {
 span[data-link-title^="Company/"] .rm-page-ref::before {
   content:"🏢 ";
 }
+span.rm-page-ref[data-tag="@priority"],
+span[data-link-title^="@priority"] .rm-page-ref {
+ color: #c2e8ba;
+ padding: 3px 4px;
+ font-weight: 700;
+ line-height: 1.4em;
+}
