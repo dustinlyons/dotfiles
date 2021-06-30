@@ -1,3 +1,4 @@
+/* Color people, places, and things */
 span[data-link-title^="Person/"] .rm-page-ref {
   background: #fac863;
   color: #202020;
@@ -6,6 +7,10 @@ span[data-link-title^="Person/"] .rm-page-ref {
   line-height: 2em;
   font-weight: 450;
 }
+span[data-link-title^="Person/"] .rm-page-ref::before {
+  content:"🧑 ";
+}
+
 span[data-link-title^="Company/"] .rm-page-ref {
   background: #c0c0c0;
   color: #202020;
@@ -14,6 +19,11 @@ span[data-link-title^="Company/"] .rm-page-ref {
   line-height: 2em;
   font-weight: 450;
 }
+span[data-link-title^="Company/"] .rm-page-ref::before {
+  content:"🏢 ";
+}
+
+/* Color my tasks framework */
 span[data-link-title^="Project/Mental/"] .rm-page-ref {
   background: #99c794;
   color: #202020;
@@ -22,6 +32,10 @@ span[data-link-title^="Project/Mental/"] .rm-page-ref {
   line-height: 2em;
   font-weight: 450;
 }
+span[data-link-title^="Project/Mental/"] .rm-page-ref::before {
+  content:"🤓 ";
+}
+
 span[data-link-title^="Project/Physical/"] .rm-page-ref {
   background: #5fb3b3;
   color: #fff;
@@ -30,6 +44,10 @@ span[data-link-title^="Project/Physical/"] .rm-page-ref {
   line-height: 2em;
   font-weight: 450;
 }
+span[data-link-title^="Project/Physical/"] .rm-page-ref::before {
+  content:"🏃 ";
+}
+
 span[data-link-title^="Project/Spiritual/"] .rm-page-ref {
   background: #c594c5;
   color: #202020;
@@ -38,6 +56,10 @@ span[data-link-title^="Project/Spiritual/"] .rm-page-ref {
   line-height: 2em;
   font-weight: 450;
 }
+span[data-link-title^="Project/Spiritual/"] .rm-page-ref::before {
+  content:"🧘‍♂️ ";
+}
+
 span[data-link-title^="Project/Emotional/"] .rm-page-ref {
   background: #6699cc;
   color: #fff;
@@ -49,21 +71,8 @@ span[data-link-title^="Project/Emotional/"] .rm-page-ref {
 span[data-link-title^="Project/Emotional/"] .rm-page-ref::before {
   content:"❣️ ";
 }
-span[data-link-title^="Project/Physical/"] .rm-page-ref::before {
-  content:"🏃 ";
-}
-span[data-link-title^="Project/Spiritual/"] .rm-page-ref::before {
-  content:"🧘‍♂️ ";
-}
-span[data-link-title^="Project/Mental/"] .rm-page-ref::before {
-  content:"🤓 ";
-}
-span[data-link-title^="Person/"] .rm-page-ref::before {
-  content:"🧑 ";
-}
-span[data-link-title^="Company/"] .rm-page-ref::before {
-  content:"🏢 ";
-}
+
+/* Important hashtags */
 span.rm-page-ref[data-tag="@priority"],
 span[data-link-title^="@priority"] .rm-page-ref {
  color: #c2e8ba;
@@ -71,3 +80,11 @@ span[data-link-title^="@priority"] .rm-page-ref {
  font-weight: 700;
  line-height: 1.4em;
 }
+
+/* Color sections  */
+.roam-block-container[data-page-links*='Tasks'] .rm-block-children {
+  background: #f3f3f3;
+  color: #202020;
+  border-radius: 6px;
+}
+
