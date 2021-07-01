@@ -101,5 +101,6 @@ span[data-link-title^="@priority"] .rm-page-ref {
 /* Shrink word count button size */
 .roam-block-container[data-page-links*='Journal'] .bp3-button {
   padding: 0 6px 0 6px;
+  float: right;
 } 
 
