@@ -39,9 +39,6 @@ span[data-link-title^="Project/Mental/"] .rm-page-ref::before {
 span[data-link-title^="Project/Physical/"] .rm-page-ref {
   background: #5fb3b3;
   color: #fff;
-  padding: 3px 7px;
-  border-radius: 6px;
-  line-height: 2em;
   font-weight: 450;
 }
 span[data-link-title^="Project/Physical/"] .rm-page-ref::before {
@@ -81,10 +78,28 @@ span[data-link-title^="@priority"] .rm-page-ref {
  line-height: 1.4em;
 }
 
-/* Color sections  */
+/* Color larger sections  */
 .roam-block-container[data-page-links*='Tasks'] .rm-block-children {
   background: #f3f3f3;
   color: #202020;
   border-radius: 6px;
 }
+.roam-block-container[data-page-links*='Log'] .rm-block-children {
+  background: #f3f3f3;
+  color: #202020;
+  border-radius: 6px;
+}
+.roam-block-container[data-page-links*='Journal'] .rm-block-children {
+  color: #555;
+  border: 1px dashed #dedede;
+  background-color: #ffffe0;
+  padding: 0;
+  list-style: none;
+  height: auto;
+}
+
+/* Shrink word count button size */
+.roam-block-container[data-page-links*='Journal'] .bp3-button {
+  padding: 0 6px 0 6px;
+} 
 
