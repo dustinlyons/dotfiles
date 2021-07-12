@@ -14,10 +14,10 @@ ntpdate -u us.pool.ntp.org
 exec thunar --daemon &
 
 ## Feh wallpaper
-## feh --no-fehbg --bg-scale $(shuf -n1 -e /home/dustin/images/wallpaper/active/*)
+feh --no-fehbg --bg-scale $(shuf -n1 -e /home/dustin/images/wallpaper/active/*)
 
 ## Dwall wallpaper
-dwall -s chihuahuan
+#dwall -s chihuahuan
 
 ## Notification Daemon
 exec dunst &

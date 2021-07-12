@@ -61,7 +61,7 @@
     </font>
   </theme>
   <desktops>
-    <number>6</number>
+    <number>5</number>
     <firstdesk>0</firstdesk>
     <names>
       <name>Scratch</name>
@@ -69,7 +69,6 @@
       <name>Finance</name>
       <name>Work</name>
       <name>Comms</name>
-      <name>Writing</name>
     </names>
     <popupTime>0</popupTime>
   </desktops>
@@ -84,7 +83,7 @@
   </resize>
   <margins>
     <top>60</top>
-    <bottom>40</bottom>
+    <bottom>35</bottom>
     <left>35</left>
     <right>35</right>
   </margins>
@@ -686,6 +685,9 @@
         <height>50%</height>
       </size>
     </application>
+  <application name="brave">
+      <focus>yes</focus>
+  </application>
     <!--
 
   # this is an example with comments through out. use these to make your
