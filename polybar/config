@@ -52,8 +52,8 @@ font-3=MaterialIcons:size=13;4
 font-6=FreeSerif:style=Regular:size=14
 
 modules-right = popup-calendar pulseaudio powermenu
-modules-center = updates
-modules-left = workspaces-active workspaces athens
+modules-center = spotify
+modules-left = workspaces-active workspaces athens updates
 
 ;                      _       _           
 ;  _ __ ___   ___   __| |_   _| | ___  ___ 
