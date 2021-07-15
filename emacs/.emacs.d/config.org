@@ -1,0 +1,201 @@
+#+TITLE: Dustin Lyons' emacs configuration
+#+OPTIONS: toc:nil h:4
+
+Last exported:  {{{modification-time(%Y-%m-%d %H:%M)}}}
+
+#+TOC: headlines 4
+
+* Configuration   :emacs:
+** About this file
+This is my emacs config file. Yes, in emacs you can write configuration in the same way you would write a Google Doc and get away with it.
+
+** Background
+As of July 13, 2021, I'm a recent vim expact. What led me here, you may ask?
+
+In late 2020, I discovered Roam and the movement behind networked notes, or "smart notes" aka Zettlekasten. I was writing in a style that made sense to my brain, and I was more focused on recording ideas for my future self to rediscover, instead of just being buried away in a folder. This was foundational as it enabled me to create more leverage.
+
+However, these ideas weren't unique to Roam. I began to look at others, and I quickly found problem with the available tools on the market. I began to look at open source equivalents and found org-roam. Given vim's modal editing was foundational to my life many years ago, this gave me an excuse to make the leap over to kick the tires on _evil mode_ and test a new wn workflow. Once I peaked into everything emacs had to offer, I was hooked.
+
+It's pretty clear that the vim vs emacs battle is over, and the real winner
+is emacs with evil mode.
+
+** For the reader
+
+For the reader, here are some useful facts to aid in your understanding of this configuration:
+
+- The _t_ variable stands for _true_, and is used with _nil_ to form boolean operations.
+- "Evil mode" is essentially vim, inside emacs. It's the best of both worlds.
+
+:PROPERTIES:
+:CUSTOM_ID: babel-init
+:END:
+<<babel-init>>
+
+** Starting up
+
+Here's how we start:
+
+#+NAME: startup
+#+BEGIN_SRC emacs-lisp 
+  ;; Turn off the splash screen
+  (setq inhibit-startup-screen t)
+
+  ;; Custom functions, we load this file at the very end
+  (setq custom-file "~/.emacs.d/local-config.org")
+  (load custom-file t)
+#+END_SRC
+
+** Personal information
+
+Just me!
+
+#+NAME: personal-info
+#+BEGIN_SRC emacs-lisp 
+  (setq user-full-name "Dustin Lyons"
+    user-mail-address "hello@dustinlyons.co")
+#+END_SRC
+
+** Emacs initialization
+
+*** Add package sources
+
+This associates our package manager with the right source (MELPA).
+
+#+NAME: package-sources
+#+BEGIN_SRC emacs-lisp 
+  (unless (assoc-default "melpa" package-archives)
+    (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t))
+  (unless (assoc-default "nongnu" package-archives)
+    (add-to-list 'package-archives '("nongnu" . "https://elpa.nongnu.org/nongnu/") t))
+#+END_SRC
+
+*** Packages
+
+Here we install some package helpers and begin downloading some core packages.
+
+**** Install some utility and plumbing related plugins
+#+NAME: utility-packages
+#+BEGIN_SRC emacs-lisp 
+#+END_SRC
+     
+**** Install straight.el, our package manager
+#+NAME: straight-el
+#+BEGIN_SRC emacs-lisp
+  ;; use-package package provides common package import functions
+  (unless (package-installed-p 'use-package)
+    (package-install 'use-package))
+  (setq use-package-verbose t)
+  (setq use-package-always-ensure t)
+  (require 'use-package)
+
+  ;; This sets up straight.el, a git package manager
+  (defvar bootstrap-version)
+    (let ((bootstrap-file
+	 (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
+	(bootstrap-version 5))
+    (unless (file-exists-p bootstrap-file)
+      (with-current-buffer
+	  (url-retrieve-synchronously
+	   "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
+	   'silent 'inhibit-cookies)
+	(goto-char (point-max))
+	(eval-print-last-sexp)))
+    (load bootstrap-file nil 'nomessage))
+
+  ;; Tells (use-package) to use straight.el to download packages
+  ;; straight.el uses git packages, instead of the default bin files, which we like
+  (setq straight-use-package-by-default t)
+#+END_SRC
+
+**** Install and turn on org mode and related packages
+
+If you haven't heard of org mode, go watch [[https://www.youtube.com/watch?v=SzA2YODtgK4][this]] talk and come back when you are finished.
+
+#+NAME: org-mode
+#+BEGIN_SRC emacs-lsp
+#+END_SRC
+
+#+NAME: evil-packages
+#+BEGIN_SRC emacs-lisp 
+  (use-package evil
+    :init
+    (setq evil-want-keybinding nil)
+    :config
+    (evil-mode 1))
+
+  ;; Gives me vim bindings elsewhere in emacs
+  (use-package evil-collection
+    :after evil
+    :config
+    (evil-collection-init))
+
+  ;; Keybindings in org mode
+  (use-package evil-org
+    :after org
+    :hook (org-mode . (lambda () evil-org-mode))
+    :config
+    (require 'evil-org-agenda)
+    (evil-org-agenda-set-keys))
+
+  ;; Branching undo system
+  (use-package undo-tree
+    :after evil
+    :diminish undo-tree-mode
+    :config
+    (evil-set-undo-system 'undo-tree)
+    (global-undo-tree-mode 1))
+
+  ;; Undo/redo each motion, emulates vim behavior
+  (setq evil-want-fine-undo 'fine)
+#+END_SRC
+
+** Emacs modes
+*** Global Modes
+#+NAME: global-modes
+#+BEGIN_SRC emacs-lisp 
+  (display-time-mode t)
+  (line-number-mode t)
+  (show-paren-mode t)
+#+END_SRC
+
+*** Markdown Mode
+#+NAME::markdown-mode
+#+BEGIN_SRC emacs-lisp 
+  ;; This uses Github Flavored Markdown for README files
+  (use-package markdown-mode
+    :commands (markdown-mode gfm-mode)
+    :mode (("README\\.md\\'" . gfm-mode)
+	   ("\\.md\\'" . markdown-mode)
+	   ("\\.markdown\\'" . markdown-mode))
+    :init (setq markdown-command "multimarkdown"))
+#+END_SRC
+
+** Display options
+*** Themes
+#+NAME: themes
+#+BEGIN_SRC emacs-lisp 
+  (add-to-list 'custom-theme-load-path "~/.dotfiles/emacs/.emacs.d/themes")
+  (load-theme 'dracula t)
+#+END_SRC
+
+*** Windows
+**** Defaults
+Sets some reasonable defaults.
+
+#+NAME: windows-reasonable-defaults
+#+BEGIN_SRC emacs-lisp 
+  (setq use-dialog-box nil
+      use-file-dialog nil
+      cursor-type 'bar)
+#+END_SRC
+
+**** UI settings
+Turns off the various menu bars, they're quite ugly.
+
+#+NAME: windows-ui-settings
+#+BEGIN_SRC emacs-lisp 
+  ;; Turn off UI junk
+  (scroll-bar-mode -1)
+  (menu-bar-mode -1)
+  (tool-bar-mode -1)
+#+END_SRC
