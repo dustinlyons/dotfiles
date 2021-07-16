@@ -32,7 +32,6 @@ For the reader, here are some useful facts to aid in your understanding of this 
 <<babel-init>>
 
 ** Starting up
-
 Here's how we start:
 
 #+NAME: startup
@@ -40,13 +39,12 @@ Here's how we start:
   ;; Turn off the splash screen
   (setq inhibit-startup-screen t)
 
-  ;; Custom functions, we load this file at the very end
+  ;; CUSTOMu FUNCTIONS, we load this file at the very end
   (setq custom-file "~/.emacs.d/local-config.org")
   (load custom-file t)
 #+END_SRC
 
 ** Personal information
-
 Just me!
 
 #+NAME: personal-info
@@ -55,10 +53,71 @@ Just me!
     user-mail-address "hello@dustinlyons.co")
 #+END_SRC
 
+** Display options
+*** Themes
+Some my own, some from others.
+
+#+NAME: themes
+#+BEGIN_SRC emacs-lisp 
+  (add-to-list 'custom-theme-load-path "~/.dotfiles/emacs/.emacs.d/themes")
+  (load-theme 'dracula t)
+#+END_SRC
+
+*** Windows
+**** Defaults
+Sets some reasonable defaults.
+
+#+NAME: windows-reasonable-defaults
+#+BEGIN_SRC emacs-lisp 
+  (setq use-dialog-box nil
+      use-file-dialog nil
+      cursor-type 'bar)
+#+END_SRC
+
+**** UI settings
+Turns off the various menu bars, they're quite ugly.
+
+***** Fonts
+#+BEGIN_SRC emacs-lisp 
+(set-face-attribute 'default nil :font "Hack" :height 100)
+#+END_SRC
+
+***** Relative line numbers
+This function defines vim-style relative line numbers and activates it.
+
+#+BEGIN_SRC emacs-lisp 
+(defvar my-linum-current-line-number 0)
+
+(setq linum-format 'my-linum-relative-line-numbers)
+
+(defun my-linum-relative-line-numbers (line-number)
+  (let ((y (1+ (- line-number my-linum-current-line-number))))
+    (propertize
+     (number-to-string (cond ((<= y 0) (1- y))
+                             ((> y 0) y)))
+     'face 'linum)))
+
+(defadvice linum-update (around my-linum-update)
+  (let ((my-linum-current-line-number (line-number-at-pos)))
+    ad-do-it))
+(ad-activate 'linum-update)
+#+END_SRC
+
+***** Modes
+I like these window related minor modes.
+
+#+NAME: windows-ui-settings
+#+BEGIN_SRC emacs-lisp 
+  ;; Turn off UI junk
+  (global-linum-mode t)
+  (scroll-bar-mode -1)
+  (menu-bar-mode -1)
+  (tool-bar-mode -1)
+#+END_SRC
+
 ** Emacs initialization
 
 *** Add package sources
-
 This associates our package manager with the right source (MELPA).
 
 #+NAME: package-sources
@@ -70,15 +129,11 @@ This associates our package manager with the right source (MELPA).
 #+END_SRC
 
 *** Packages
+Here we install some helpers and begin downloading some core packages.
 
-Here we install some package helpers and begin downloading some core packages.
+**** Install straight.el with use-package
+I configure straight.el to automatically fetch packages over git via use-package. I prefer git as it's easier to version any hacks.
 
-**** Install some utility and plumbing related plugins
-#+NAME: utility-packages
-#+BEGIN_SRC emacs-lisp 
-#+END_SRC
-     
-**** Install straight.el, our package manager
 #+NAME: straight-el
 #+BEGIN_SRC emacs-lisp
   ;; use-package package provides common package import functions
@@ -107,13 +162,70 @@ Here we install some package helpers and begin downloading some core packages.
   (setq straight-use-package-by-default t)
 #+END_SRC
 
-**** Install and turn on org mode and related packages
+**** Packages to help me learn emacs
+These packages may come and go, but ultimately aid in my understanding of emacs and emacslisp.
 
+#+NAME: utility-packages
+#+BEGIN_SRC emacs-lisp 
+  ;; Gives me a fancy list of commands I run
+  (use-package command-log-mode)
+  (setq global-command-log-mode t)
+  ;; TODO Install package that lets you define help screens for keymaps
+#+END_SRC
+
+**** Fuzzy file finder
+File finder and associated helpers that uses the minibuffer (the info window at the bottom).
+
+#+NAME: file-finder
+#+BEGIN_SRC emacs-lisp 
+(use-package ivy
+  :diminish
+  :bind (("C-s" . swiper)
+         :map ivy-minibuffer-map
+         ("TAB" . ivy-alt-done)
+         ("C-f" . ivy-alt-done)
+         ("C-l" . ivy-alt-done)
+         ("C-j" . ivy-next-line)
+         ("C-k" . ivy-previous-line)
+         :map ivy-switch-buffer-map
+         ("C-k" . ivy-previous-line)
+         ("C-l" . ivy-done)
+         ("C-d" . ivy-switch-buffer-kill)
+         :map ivy-reverse-i-search-map
+         ("C-k" . ivy-previous-line)
+         ("C-d" . ivy-reverse-i-search-kill))
+  :init
+  (ivy-mode 1)
+  :config
+  (setq ivy-use-virtual-buffers t)
+  (setq ivy-wrap t)
+  (setq ivy-count-format "(%d/%d) ")
+  (setq enable-recursive-minibuffers t))
+
+(use-package counsel
+  :demand t
+  :bind (("M-x" . counsel-M-x)
+         ("C-x b" . counsel-ibuffer)
+         ("C-x C-f" . counsel-find-file)
+         ;; ("C-M-j" . counsel-switch-buffer)
+         ("C-M-l" . counsel-imenu)
+         :map minibuffer-local-map
+         ("C-r" . 'counsel-minibuffer-history))
+  :custom
+  (counsel-linux-app-format-function #'counsel-linux-app-format-function-name-only)
+  :config
+  (setq ivy-initial-inputs-alist nil)) ;; Don't start searches with ^
+#+END_SRC
+
+**** Install and turn on org mode and related packages
 If you haven't heard of org mode, go watch [[https://www.youtube.com/watch?v=SzA2YODtgK4][this]] talk and come back when you are finished.
 
 #+NAME: org-mode
 #+BEGIN_SRC emacs-lsp
 #+END_SRC
+
+**** Vim inside emacs (evil mode)
+This is what makes emacs possible for me. All evil mode packages and related configuration.
 
 #+NAME: evil-packages
 #+BEGIN_SRC emacs-lisp 
@@ -140,19 +252,25 @@ If you haven't heard of org mode, go watch [[https://www.youtube.com/watch?v=SzA
   ;; Branching undo system
   (use-package undo-tree
     :after evil
-    :diminish undo-tree-mode
+    :diminish 
     :config
     (evil-set-undo-system 'undo-tree)
     (global-undo-tree-mode 1))
 
-  ;; Undo/redo each motion, emulates vim behavior
+  ;; Undo/redo each motion
   (setq evil-want-fine-undo 'fine)
+  ;; Use esc as cancel key everywhere
+  (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
+
 #+END_SRC
 
 ** Emacs modes
 *** Global Modes
+I like these modes.
+
 #+NAME: global-modes
 #+BEGIN_SRC emacs-lisp 
+  (global-visual-line-mode t)
   (display-time-mode t)
   (line-number-mode t)
   (show-paren-mode t)
@@ -170,32 +288,22 @@ If you haven't heard of org mode, go watch [[https://www.youtube.com/watch?v=SzA
     :init (setq markdown-command "multimarkdown"))
 #+END_SRC
 
-** Display options
-*** Themes
-#+NAME: themes
+#+NAME::org-mode
 #+BEGIN_SRC emacs-lisp 
-  (add-to-list 'custom-theme-load-path "~/.dotfiles/emacs/.emacs.d/themes")
-  (load-theme 'dracula t)
-#+END_SRC
+  (use-package org
+    :defer t
+    :config
+    (setq org-ellipsis " ▾"
+        org-src-fontify-natively t
+        org-fontify-quote-and-verse-blocks t))
 
-*** Windows
-**** Defaults
-Sets some reasonable defaults.
+    (setq org-todo-keywords
+    '((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d!)")
+        (sequence "|" "WAIT(w)" "SOME(b)")))
 
-#+NAME: windows-reasonable-defaults
-#+BEGIN_SRC emacs-lisp 
-  (setq use-dialog-box nil
-      use-file-dialog nil
-      cursor-type 'bar)
-#+END_SRC
-
-**** UI settings
-Turns off the various menu bars, they're quite ugly.
-
-#+NAME: windows-ui-settings
-#+BEGIN_SRC emacs-lisp 
-  ;; Turn off UI junk
-  (scroll-bar-mode -1)
-  (menu-bar-mode -1)
-  (tool-bar-mode -1)
+    ;; TODO: org-todo-keyword-faces
+    (setq org-todo-keyword-faces
+    '(("NEXT" . (:foreground "orange red" :weight bold))
+        ("WAIT" . (:foreground "HotPink2" :weight bold))
+	("SOME" . (:foreground "MediumPurple3" :weight bold))))
 #+END_SRC

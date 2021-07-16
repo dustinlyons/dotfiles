@@ -1,4 +1,0 @@
-#+BEGIN_SRC emacs-lisp
-(defvar dlyons/default-screen-width 120)
-(defvar dlyons/default-screen-height 70)
-#+END_SRC

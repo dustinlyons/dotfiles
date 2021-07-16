@@ -1,19 +1,48 @@
 ;; Turn off the splash screen
 (setq inhibit-startup-screen t)
 
-;; Custom functions, we load this file at the very end
+;; CUSTOMu FUNCTIONS, we load this file at the very end
 (setq custom-file "~/.emacs.d/local-config.org")
 (load custom-file t)
 
 (setq user-full-name "Dustin Lyons"
   user-mail-address "hello@dustinlyons.co")
 
+(add-to-list 'custom-theme-load-path "~/.dotfiles/emacs/.emacs.d/themes")
+(load-theme 'dracula t)
+
+(setq use-dialog-box nil
+    use-file-dialog nil
+    cursor-type 'bar)
+
+(set-face-attribute 'default nil :font "Hack" :height 100)
+
+(defvar my-linum-current-line-number 0)
+
+(setq linum-format 'my-linum-relative-line-numbers)
+
+(defun my-linum-relative-line-numbers (line-number)
+  (let ((y (1+ (- line-number my-linum-current-line-number))))
+    (propertize
+     (number-to-string (cond ((<= y 0) (1- y))
+                             ((> y 0) y)))
+     'face 'linum)))
+
+(defadvice linum-update (around my-linum-update)
+  (let ((my-linum-current-line-number (line-number-at-pos)))
+    ad-do-it))
+(ad-activate 'linum-update)
+
+;; Turn off UI junk
+(global-linum-mode t)
+(scroll-bar-mode -1)
+(menu-bar-mode -1)
+(tool-bar-mode -1)
+
 (unless (assoc-default "melpa" package-archives)
   (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t))
 (unless (assoc-default "nongnu" package-archives)
   (add-to-list 'package-archives '("nongnu" . "https://elpa.nongnu.org/nongnu/") t))
-
-
 
 ;; use-package package provides common package import functions
 (unless (package-installed-p 'use-package)
@@ -40,6 +69,49 @@
 ;; straight.el uses git packages, instead of the default bin files, which we like
 (setq straight-use-package-by-default t)
 
+;; Gives me a fancy list of commands I run
+(use-package command-log-mode)
+(setq global-command-log-mode t)
+;; TODO Install package that lets you define help screens for keymaps
+
+(use-package ivy
+  :diminish
+  :bind (("C-s" . swiper)
+         :map ivy-minibuffer-map
+         ("TAB" . ivy-alt-done)
+         ("C-f" . ivy-alt-done)
+         ("C-l" . ivy-alt-done)
+         ("C-j" . ivy-next-line)
+         ("C-k" . ivy-previous-line)
+         :map ivy-switch-buffer-map
+         ("C-k" . ivy-previous-line)
+         ("C-l" . ivy-done)
+         ("C-d" . ivy-switch-buffer-kill)
+         :map ivy-reverse-i-search-map
+         ("C-k" . ivy-previous-line)
+         ("C-d" . ivy-reverse-i-search-kill))
+  :init
+  (ivy-mode 1)
+  :config
+  (setq ivy-use-virtual-buffers t)
+  (setq ivy-wrap t)
+  (setq ivy-count-format "(%d/%d) ")
+  (setq enable-recursive-minibuffers t))
+
+(use-package counsel
+  :demand t
+  :bind (("M-x" . counsel-M-x)
+         ("C-x b" . counsel-ibuffer)
+         ("C-x C-f" . counsel-find-file)
+         ;; ("C-M-j" . counsel-switch-buffer)
+         ("C-M-l" . counsel-imenu)
+         :map minibuffer-local-map
+         ("C-r" . 'counsel-minibuffer-history))
+  :custom
+  (counsel-linux-app-format-function #'counsel-linux-app-format-function-name-only)
+  :config
+  (setq ivy-initial-inputs-alist nil)) ;; Don't start searches with ^
+
 (use-package evil
   :init
   (setq evil-want-keybinding nil)
@@ -63,14 +135,17 @@
 ;; Branching undo system
 (use-package undo-tree
   :after evil
-  :diminish undo-tree-mode
+  :diminish 
   :config
   (evil-set-undo-system 'undo-tree)
   (global-undo-tree-mode 1))
 
-;; Undo/redo each motion, emulates vim behavior
+;; Undo/redo each motion
 (setq evil-want-fine-undo 'fine)
+;; Use esc as cancel key everywhere
+(global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 
+(global-visual-line-mode t)
 (display-time-mode t)
 (line-number-mode t)
 (show-paren-mode t)
@@ -83,14 +158,19 @@
 	 ("\\.markdown\\'" . markdown-mode))
   :init (setq markdown-command "multimarkdown"))
 
-(add-to-list 'custom-theme-load-path "~/.dotfiles/emacs/.emacs.d/themes")
-(load-theme 'dracula t)
+(use-package org
+  :defer t
+  :config
+  (setq org-ellipsis " ▾"
+      org-src-fontify-natively t
+      org-fontify-quote-and-verse-blocks t))
 
-(setq use-dialog-box nil
-    use-file-dialog nil
-    cursor-type 'bar)
+  (setq org-todo-keywords
+  '((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d!)")
+      (sequence "|" "WAIT(w)" "SOME(b)")))
 
-;; Turn off UI junk
-(scroll-bar-mode -1)
-(menu-bar-mode -1)
-(tool-bar-mode -1)
+  ;; TODO: org-todo-keyword-faces
+  (setq org-todo-keyword-faces
+  '(("NEXT" . (:foreground "orange red" :weight bold))
+      ("WAIT" . (:foreground "HotPink2" :weight bold))
+      ("SOME" . (:foreground "MediumPurple3" :weight bold))))
