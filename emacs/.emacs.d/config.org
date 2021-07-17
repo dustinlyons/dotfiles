@@ -20,7 +20,6 @@ It's pretty clear that the vim vs emacs battle is over, and the real winner
 is emacs with evil mode.
 
 ** For the reader
-
 For the reader, here are some useful facts to aid in your understanding of this configuration:
 
 - The _t_ variable stands for _true_, and is used with _nil_ to form boolean operations.
@@ -30,6 +29,15 @@ For the reader, here are some useful facts to aid in your understanding of this 
 :CUSTOM_ID: babel-init
 :END:
 <<babel-init>>
+
+** Personal information
+Just me!
+
+#+NAME: personal-info
+#+BEGIN_SRC emacs-lisp 
+  (setq user-full-name "Dustin Lyons"
+    user-mail-address "hello@dustinlyons.co")
+#+END_SRC
 
 ** Starting up
 Here's how we start:
@@ -44,79 +52,7 @@ Here's how we start:
   (load custom-file t)
 #+END_SRC
 
-** Personal information
-Just me!
-
-#+NAME: personal-info
-#+BEGIN_SRC emacs-lisp 
-  (setq user-full-name "Dustin Lyons"
-    user-mail-address "hello@dustinlyons.co")
-#+END_SRC
-
-** Display options
-*** Themes
-Some my own, some from others.
-
-#+NAME: themes
-#+BEGIN_SRC emacs-lisp 
-  (add-to-list 'custom-theme-load-path "~/.dotfiles/emacs/.emacs.d/themes")
-  (load-theme 'dracula t)
-#+END_SRC
-
-*** Windows
-**** Defaults
-Sets some reasonable defaults.
-
-#+NAME: windows-reasonable-defaults
-#+BEGIN_SRC emacs-lisp 
-  (setq use-dialog-box nil
-      use-file-dialog nil
-      cursor-type 'bar)
-#+END_SRC
-
-**** UI settings
-Turns off the various menu bars, they're quite ugly.
-
-***** Fonts
-#+BEGIN_SRC emacs-lisp 
-(set-face-attribute 'default nil :font "Hack" :height 100)
-#+END_SRC
-
-***** Relative line numbers
-This function defines vim-style relative line numbers and activates it.
-
-#+BEGIN_SRC emacs-lisp 
-(defvar my-linum-current-line-number 0)
-
-(setq linum-format 'my-linum-relative-line-numbers)
-
-(defun my-linum-relative-line-numbers (line-number)
-  (let ((y (1+ (- line-number my-linum-current-line-number))))
-    (propertize
-     (number-to-string (cond ((<= y 0) (1- y))
-                             ((> y 0) y)))
-     'face 'linum)))
-
-(defadvice linum-update (around my-linum-update)
-  (let ((my-linum-current-line-number (line-number-at-pos)))
-    ad-do-it))
-(ad-activate 'linum-update)
-#+END_SRC
-
-***** Modes
-I like these window related minor modes.
-
-#+NAME: windows-ui-settings
-#+BEGIN_SRC emacs-lisp 
-  ;; Turn off UI junk
-  (global-linum-mode t)
-  (scroll-bar-mode -1)
-  (menu-bar-mode -1)
-  (tool-bar-mode -1)
-#+END_SRC
-
 ** Emacs initialization
-
 *** Add package sources
 This associates our package manager with the right source (MELPA).
 
@@ -162,18 +98,154 @@ I configure straight.el to automatically fetch packages over git via use-package
   (setq straight-use-package-by-default t)
 #+END_SRC
 
-**** Packages to help me learn emacs
-These packages may come and go, but ultimately aid in my understanding of emacs and emacslisp.
+** Display options
+*** Themes
+Some my own, some from others.
 
-#+NAME: utility-packages
+#+NAME: themes
 #+BEGIN_SRC emacs-lisp 
-  ;; Gives me a fancy list of commands I run
-  (use-package command-log-mode)
-  (setq global-command-log-mode t)
-  ;; TODO Install package that lets you define help screens for keymaps
+  (add-to-list 'custom-theme-load-path "~/.dotfiles/emacs/.emacs.d/themes")
+  (load-theme 'dracula t)
 #+END_SRC
 
-**** Fuzzy file finder
+*** Windows
+**** Defaults
+Sets some reasonable defaults.
+
+#+NAME: windows-reasonable-defaults
+#+BEGIN_SRC emacs-lisp 
+  (setq use-dialog-box nil
+      use-file-dialog nil
+      cursor-type 'bar)
+#+END_SRC
+
+**** UI configuration
+Turns off the various menu bars, they're quite ugly.
+
+***** Fonts
+#+BEGIN_SRC emacs-lisp 
+(set-face-attribute 'default nil :font "Hack" :height 100)
+#+END_SRC
+
+***** Relative line numbers
+This function defines vim-style relative line numbers and activates it.
+
+#+BEGIN_SRC emacs-lisp 
+  (defvar my-linum-current-line-number 0)
+  (setq linum-format 'my-linum-relative-line-numbers)
+
+  ;; This fancy function handles the math behind relative line numbers
+  (defun my-linum-relative-line-numbers (line-number)
+    (let ((y (1+ (- line-number my-linum-current-line-number))))
+      (propertize
+       (number-to-string
+	 (cond ((<= y 0) (abs (- y 2))) ((> y 0) y)))
+	 'face 'linum)))
+
+  (defadvice linum-update (around my-linum-update)
+    (let ((my-linum-current-line-number (line-number-at-pos)))
+      ad-do-it))
+  (ad-activate 'linum-update)
+#+END_SRC
+
+***** Modes
+I like these window related minor modes.
+
+#+NAME: windows-ui-settings
+#+BEGIN_SRC emacs-lisp 
+  ;; Turn off UI junk
+  (column-number-mode)
+  (global-linum-mode t)
+  (scroll-bar-mode -1)
+  (menu-bar-mode -1)
+  (tool-bar-mode -1)
+#+END_SRC
+
+**** "Powerline
+#+NAME: windows-ui-settings
+#+BEGIN_SRC emacs-lisp 
+  (use-package doom-modeline
+    :ensure t
+    :init (doom-modeline-mode 1))
+#+END_SRC
+
+** Global modes
+I like these modes.
+
+#+NAME: global-modes
+#+BEGIN_SRC emacs-lisp 
+  (global-visual-line-mode t) ;; Wraps lines everywhere
+  (line-number-mode t) ;; Line numbers in the gutter
+  (show-paren-mode t) ;; Highlights parans for me
+#+END_SRC
+
+** Org mode
+*** My productivity workflow
+If you haven't heard of org mode, go watch [[https://www.youtube.com/watch?v=SzA2YODtgK4][this]] talk and come back when you are finished.
+
+ #+NAME::org-mode
+ #+BEGIN_SRC emacs-lisp 
+   (use-package org
+     :defer t
+     :config
+     (setq org-ellipsis " ▾"
+         org-src-fontify-natively t
+         org-fontify-quote-and-verse-blocks t))
+
+     (setq org-todo-keywords
+     '((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d!)")
+         (sequence "|" "WAIT(w)" "SOME(b)")))
+
+     ;; TODO: org-todo-keyword-faces
+     (setq org-todo-keyword-faces
+     '(("NEXT" . (:foreground "orange red" :weight bold))
+         ("WAIT" . (:foreground "HotPink2" :weight bold))
+	 ("SOME" . (:foreground "MediumPurple3" :weight bold))))
+ #+END_SRC
+
+** Evil mode
+*** Vim inside emacs
+This is what makes emacs possible for me. All evil mode packages and related configuration.
+
+#+NAME: evil-packages
+#+BEGIN_SRC emacs-lisp 
+  (use-package evil
+    :init
+    (setq evil-want-keybinding nil)
+    :config
+    (evil-mode 1))
+
+  ;; Gives me vim bindings elsewhere in emacs
+  (use-package evil-collection
+    :after evil
+    :config
+    (evil-collection-init))
+
+  ;; Keybindings in org mode
+  (use-package evil-org
+    :after org
+    :hook (org-mode . (lambda () evil-org-mode))
+    :config
+    (require 'evil-org-agenda)
+    (evil-org-agenda-set-keys))
+
+  ;; Branching undo system
+  (use-package undo-tree
+    :after evil
+    :diminish 
+    :config
+    (evil-set-undo-system 'undo-tree)
+    (global-undo-tree-mode 1))
+
+  ;; Undo/redo each motion
+  (setq evil-want-fine-undo 'fine)
+  ;; Use esc as cancel key everywhere
+  (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
+
+#+END_SRC
+
+** Managing files
+*** Fuzzy file finder
 File finder and associated helpers that uses the minibuffer (the info window at the bottom).
 
 #+NAME: file-finder
@@ -217,93 +289,32 @@ File finder and associated helpers that uses the minibuffer (the info window at 
   (setq ivy-initial-inputs-alist nil)) ;; Don't start searches with ^
 #+END_SRC
 
-**** Install and turn on org mode and related packages
-If you haven't heard of org mode, go watch [[https://www.youtube.com/watch?v=SzA2YODtgK4][this]] talk and come back when you are finished.
-
-#+NAME: org-mode
-#+BEGIN_SRC emacs-lsp
-#+END_SRC
-
-**** Vim inside emacs (evil mode)
-This is what makes emacs possible for me. All evil mode packages and related configuration.
-
-#+NAME: evil-packages
-#+BEGIN_SRC emacs-lisp 
-  (use-package evil
-    :init
-    (setq evil-want-keybinding nil)
-    :config
-    (evil-mode 1))
-
-  ;; Gives me vim bindings elsewhere in emacs
-  (use-package evil-collection
-    :after evil
-    :config
-    (evil-collection-init))
-
-  ;; Keybindings in org mode
-  (use-package evil-org
-    :after org
-    :hook (org-mode . (lambda () evil-org-mode))
-    :config
-    (require 'evil-org-agenda)
-    (evil-org-agenda-set-keys))
-
-  ;; Branching undo system
-  (use-package undo-tree
-    :after evil
-    :diminish 
-    :config
-    (evil-set-undo-system 'undo-tree)
-    (global-undo-tree-mode 1))
-
-  ;; Undo/redo each motion
-  (setq evil-want-fine-undo 'fine)
-  ;; Use esc as cancel key everywhere
-  (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
-
-#+END_SRC
-
-** Emacs modes
-*** Global Modes
-I like these modes.
-
-#+NAME: global-modes
-#+BEGIN_SRC emacs-lisp 
-  (global-visual-line-mode t)
-  (display-time-mode t)
-  (line-number-mode t)
-  (show-paren-mode t)
-#+END_SRC
-
-*** Markdown Mode
+*** File types
+**** Markdown mode
 #+NAME::markdown-mode
 #+BEGIN_SRC emacs-lisp 
   ;; This uses Github Flavored Markdown for README files
   (use-package markdown-mode
     :commands (markdown-mode gfm-mode)
     :mode (("README\\.md\\'" . gfm-mode)
-	   ("\\.md\\'" . markdown-mode)
-	   ("\\.markdown\\'" . markdown-mode))
+      ("\\.md\\'" . markdown-mode)
+      ("\\.markdown\\'" . markdown-mode))
     :init (setq markdown-command "multimarkdown"))
 #+END_SRC
 
-#+NAME::org-mode
+** Learning emacs
+*** Indent org-babel source blocks
 #+BEGIN_SRC emacs-lisp 
-  (use-package org
-    :defer t
-    :config
-    (setq org-ellipsis " ▾"
-        org-src-fontify-natively t
-        org-fontify-quote-and-verse-blocks t))
+  (setq org-src-tab-acts-natively t)
+#+END_SRC
 
-    (setq org-todo-keywords
-    '((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d!)")
-        (sequence "|" "WAIT(w)" "SOME(b)")))
+*** Show real time key bindings
+These packages may come and go, but ultimately aid in my understanding of emacs and emacslisp.
 
-    ;; TODO: org-todo-keyword-faces
-    (setq org-todo-keyword-faces
-    '(("NEXT" . (:foreground "orange red" :weight bold))
-        ("WAIT" . (:foreground "HotPink2" :weight bold))
-	("SOME" . (:foreground "MediumPurple3" :weight bold))))
+#+NAME: utility-packages
+#+BEGIN_SRC emacs-lisp 
+  ;; Gives me a fancy list of commands I run
+  (use-package command-log-mode)
+  (setq global-command-log-mode t)
+  ;; TODO Install package that lets you define help screens for keymaps
 #+END_SRC

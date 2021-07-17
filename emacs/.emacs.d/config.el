@@ -1,43 +1,12 @@
+(setq user-full-name "Dustin Lyons"
+  user-mail-address "hello@dustinlyons.co")
+
 ;; Turn off the splash screen
 (setq inhibit-startup-screen t)
 
 ;; CUSTOMu FUNCTIONS, we load this file at the very end
 (setq custom-file "~/.emacs.d/local-config.org")
 (load custom-file t)
-
-(setq user-full-name "Dustin Lyons"
-  user-mail-address "hello@dustinlyons.co")
-
-(add-to-list 'custom-theme-load-path "~/.dotfiles/emacs/.emacs.d/themes")
-(load-theme 'dracula t)
-
-(setq use-dialog-box nil
-    use-file-dialog nil
-    cursor-type 'bar)
-
-(set-face-attribute 'default nil :font "Hack" :height 100)
-
-(defvar my-linum-current-line-number 0)
-
-(setq linum-format 'my-linum-relative-line-numbers)
-
-(defun my-linum-relative-line-numbers (line-number)
-  (let ((y (1+ (- line-number my-linum-current-line-number))))
-    (propertize
-     (number-to-string (cond ((<= y 0) (1- y))
-                             ((> y 0) y)))
-     'face 'linum)))
-
-(defadvice linum-update (around my-linum-update)
-  (let ((my-linum-current-line-number (line-number-at-pos)))
-    ad-do-it))
-(ad-activate 'linum-update)
-
-;; Turn off UI junk
-(global-linum-mode t)
-(scroll-bar-mode -1)
-(menu-bar-mode -1)
-(tool-bar-mode -1)
 
 (unless (assoc-default "melpa" package-archives)
   (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t))
@@ -69,10 +38,91 @@
 ;; straight.el uses git packages, instead of the default bin files, which we like
 (setq straight-use-package-by-default t)
 
-;; Gives me a fancy list of commands I run
-(use-package command-log-mode)
-(setq global-command-log-mode t)
-;; TODO Install package that lets you define help screens for keymaps
+(add-to-list 'custom-theme-load-path "~/.dotfiles/emacs/.emacs.d/themes")
+(load-theme 'dracula t)
+
+(setq use-dialog-box nil
+    use-file-dialog nil
+    cursor-type 'bar)
+
+(set-face-attribute 'default nil :font "Hack" :height 100)
+
+(defvar my-linum-current-line-number 0)
+(setq linum-format 'my-linum-relative-line-numbers)
+
+;; This fancy function handles the math behind relative line numbers
+(defun my-linum-relative-line-numbers (line-number)
+  (let ((y (1+ (- line-number my-linum-current-line-number))))
+    (propertize
+     (number-to-string
+       (cond ((<= y 0) (abs (- y 2))) ((> y 0) y)))
+       'face 'linum)))
+
+(defadvice linum-update (around my-linum-update)
+  (let ((my-linum-current-line-number (line-number-at-pos)))
+    ad-do-it))
+(ad-activate 'linum-update)
+
+;; Turn off UI junk
+(column-number-mode)
+(global-linum-mode t)
+(scroll-bar-mode -1)
+(menu-bar-mode -1)
+(tool-bar-mode -1)
+
+(global-visual-line-mode t) ;; Wraps lines everywhere
+(line-number-mode t) ;; Line numbers in the gutter
+(show-paren-mode t) ;; Highlights parans for me
+
+(use-package org
+  :defer t
+  :config
+  (setq org-ellipsis " ▾"
+      org-src-fontify-natively t
+      org-fontify-quote-and-verse-blocks t))
+
+  (setq org-todo-keywords
+  '((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d!)")
+      (sequence "|" "WAIT(w)" "SOME(b)")))
+
+  ;; TODO: org-todo-keyword-faces
+  (setq org-todo-keyword-faces
+  '(("NEXT" . (:foreground "orange red" :weight bold))
+      ("WAIT" . (:foreground "HotPink2" :weight bold))
+      ("SOME" . (:foreground "MediumPurple3" :weight bold))))
+
+(use-package evil
+  :init
+  (setq evil-want-keybinding nil)
+  :config
+  (evil-mode 1))
+
+;; Gives me vim bindings elsewhere in emacs
+(use-package evil-collection
+  :after evil
+  :config
+  (evil-collection-init))
+
+;; Keybindings in org mode
+(use-package evil-org
+  :after org
+  :hook (org-mode . (lambda () evil-org-mode))
+  :config
+  (require 'evil-org-agenda)
+  (evil-org-agenda-set-keys))
+
+;; Branching undo system
+(use-package undo-tree
+  :after evil
+  :diminish 
+  :config
+  (evil-set-undo-system 'undo-tree)
+  (global-undo-tree-mode 1))
+
+;; Undo/redo each motion
+(setq evil-want-fine-undo 'fine)
+;; Use esc as cancel key everywhere
+(global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 
 (use-package ivy
   :diminish
@@ -112,65 +162,17 @@
   :config
   (setq ivy-initial-inputs-alist nil)) ;; Don't start searches with ^
 
-(use-package evil
-  :init
-  (setq evil-want-keybinding nil)
-  :config
-  (evil-mode 1))
-
-;; Gives me vim bindings elsewhere in emacs
-(use-package evil-collection
-  :after evil
-  :config
-  (evil-collection-init))
-
-;; Keybindings in org mode
-(use-package evil-org
-  :after org
-  :hook (org-mode . (lambda () evil-org-mode))
-  :config
-  (require 'evil-org-agenda)
-  (evil-org-agenda-set-keys))
-
-;; Branching undo system
-(use-package undo-tree
-  :after evil
-  :diminish 
-  :config
-  (evil-set-undo-system 'undo-tree)
-  (global-undo-tree-mode 1))
-
-;; Undo/redo each motion
-(setq evil-want-fine-undo 'fine)
-;; Use esc as cancel key everywhere
-(global-set-key (kbd "<escape>") 'keyboard-escape-quit)
-
-(global-visual-line-mode t)
-(display-time-mode t)
-(line-number-mode t)
-(show-paren-mode t)
-
 ;; This uses Github Flavored Markdown for README files
 (use-package markdown-mode
   :commands (markdown-mode gfm-mode)
   :mode (("README\\.md\\'" . gfm-mode)
-	 ("\\.md\\'" . markdown-mode)
-	 ("\\.markdown\\'" . markdown-mode))
+    ("\\.md\\'" . markdown-mode)
+    ("\\.markdown\\'" . markdown-mode))
   :init (setq markdown-command "multimarkdown"))
 
-(use-package org
-  :defer t
-  :config
-  (setq org-ellipsis " ▾"
-      org-src-fontify-natively t
-      org-fontify-quote-and-verse-blocks t))
+(setq org-src-tab-acts-natively t)
 
-  (setq org-todo-keywords
-  '((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d!)")
-      (sequence "|" "WAIT(w)" "SOME(b)")))
-
-  ;; TODO: org-todo-keyword-faces
-  (setq org-todo-keyword-faces
-  '(("NEXT" . (:foreground "orange red" :weight bold))
-      ("WAIT" . (:foreground "HotPink2" :weight bold))
-      ("SOME" . (:foreground "MediumPurple3" :weight bold))))
+;; Gives me a fancy list of commands I run
+(use-package command-log-mode)
+(setq global-command-log-mode t)
+;; TODO Install package that lets you define help screens for keymaps
