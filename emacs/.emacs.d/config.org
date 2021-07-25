@@ -17,7 +17,7 @@ In late 2020, I discovered Roam and the movement behind networked notes, or "sma
 However, these ideas weren't unique to Roam. I began to look at others, and I quickly found problem with the available tools on the market. I began to look at open source equivalents and found org-roam. Given vim's modal editing was foundational to my life many years ago, this gave me an excuse to make the leap over to kick the tires on _evil mode_ and test a new wn workflow. Once I peaked into everything emacs had to offer, I was hooked.
 
 It's pretty clear that the vim vs emacs battle is over, and the real winner
-is emacs with evil mode.
+is emacs with evil mode
 
 ** For the reader
 For the reader, here are some useful facts to aid in your understanding of this configuration:
@@ -47,7 +47,7 @@ Here's how we start:
   ;; Turn off the splash screen
   (setq inhibit-startup-screen t)
 
-  ;; CUSTOMu FUNCTIONS, we load this file at the very end
+  ;; CUSTOM FUNCTIONS, we load this file at the very end
   (setq custom-file "~/.emacs.d/local-config.org")
   (load custom-file t)
 #+END_SRC
@@ -127,25 +127,36 @@ Turns off the various menu bars, they're quite ugly.
 (set-face-attribute 'default nil :font "Hack" :height 100)
 #+END_SRC
 
-***** Relative line numbers
-This function defines vim-style relative line numbers and activates it.
+***** Line numbers
+These functions define vim-style relative line numbers.
 
+#+NAME: line-numbers
 #+BEGIN_SRC emacs-lisp 
+  (global-linum-mode 1)
   (defvar my-linum-current-line-number 0)
   (setq linum-format 'my-linum-relative-line-numbers)
 
   ;; This fancy function handles the math behind relative line numbers
   (defun my-linum-relative-line-numbers (line-number)
-    (let ((y (1+ (- line-number my-linum-current-line-number))))
+  (let ((y (1+ (- line-number my-linum-current-line-number))))
       (propertize
-       (number-to-string
-	 (cond ((<= y 0) (abs (- y 2))) ((> y 0) y)))
-	 'face 'linum)))
+      (number-to-string
+	  (cond ((<= y 0) (abs (- y 2))) ((> y 0) y)))
+	  'face 'linum)))
 
   (defadvice linum-update (around my-linum-update)
-    (let ((my-linum-current-line-number (line-number-at-pos)))
+  (let ((my-linum-current-line-number (line-number-at-pos)))
       ad-do-it))
+
+  ;; Turn it on
   (ad-activate 'linum-update)
+
+  ;; Disable line numbers for some modes
+  (dolist (mode '(org-mode-hook
+		  term-mode-hook
+		  shell-mode-hook
+		  eshell-mode-hook))
+    (add-hook mode (lambda () (linum-mode 0)))) 
 #+END_SRC
 
 ***** Modes
@@ -155,14 +166,13 @@ I like these window related minor modes.
 #+BEGIN_SRC emacs-lisp 
   ;; Turn off UI junk
   (column-number-mode)
-  (global-linum-mode t)
   (scroll-bar-mode -1)
   (menu-bar-mode -1)
   (tool-bar-mode -1)
 #+END_SRC
 
 **** "Powerline
-#+NAME: windows-ui-settings
+#+NAME: modeline
 #+BEGIN_SRC emacs-lisp 
   (use-package doom-modeline
     :ensure t
@@ -183,25 +193,15 @@ I like these modes.
 *** My productivity workflow
 If you haven't heard of org mode, go watch [[https://www.youtube.com/watch?v=SzA2YODtgK4][this]] talk and come back when you are finished.
 
- #+NAME::org-mode
- #+BEGIN_SRC emacs-lisp 
-   (use-package org
-     :defer t
-     :config
-     (setq org-ellipsis " ▾"
-         org-src-fontify-natively t
-         org-fontify-quote-and-verse-blocks t))
+#+NAME::org-mode
+#+BEGIN_SRC emacs-lisp 
+(use-package org
+  :defer t
+  :config
+    (setq org-edit-src-content-indentation 2
+          org-hide-block-startup nil))
+#+END_SRC
 
-     (setq org-todo-keywords
-     '((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d!)")
-         (sequence "|" "WAIT(w)" "SOME(b)")))
-
-     ;; TODO: org-todo-keyword-faces
-     (setq org-todo-keyword-faces
-     '(("NEXT" . (:foreground "orange red" :weight bold))
-         ("WAIT" . (:foreground "HotPink2" :weight bold))
-	 ("SOME" . (:foreground "MediumPurple3" :weight bold))))
- #+END_SRC
 
 ** Evil mode
 *** Vim inside emacs
@@ -222,12 +222,12 @@ This is what makes emacs possible for me. All evil mode packages and related con
     (evil-collection-init))
 
   ;; Keybindings in org mode
-  (use-package evil-org
-    :after org
-    :hook (org-mode . (lambda () evil-org-mode))
-    :config
-    (require 'evil-org-agenda)
-    (evil-org-agenda-set-keys))
+ ;; (use-package evil-org
+  ;;  :after org
+   ;; :hook (org-mode . (lambda () evil-org-mode))
+   ;; :config
+   ;; (require 'evil-org-agenda)
+   ;; (evil-org-agenda-set-keys))
 
   ;; Branching undo system
   (use-package undo-tree

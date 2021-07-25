@@ -4,7 +4,7 @@
 ;; Turn off the splash screen
 (setq inhibit-startup-screen t)
 
-;; CUSTOMu FUNCTIONS, we load this file at the very end
+;; CUSTOM FUNCTIONS, we load this file at the very end
 (setq custom-file "~/.emacs.d/local-config.org")
 (load custom-file t)
 
@@ -47,28 +47,41 @@
 
 (set-face-attribute 'default nil :font "Hack" :height 100)
 
+(global-linum-mode 1)
 (defvar my-linum-current-line-number 0)
 (setq linum-format 'my-linum-relative-line-numbers)
 
 ;; This fancy function handles the math behind relative line numbers
 (defun my-linum-relative-line-numbers (line-number)
-  (let ((y (1+ (- line-number my-linum-current-line-number))))
+(let ((y (1+ (- line-number my-linum-current-line-number))))
     (propertize
-     (number-to-string
-       (cond ((<= y 0) (abs (- y 2))) ((> y 0) y)))
-       'face 'linum)))
+    (number-to-string
+	(cond ((<= y 0) (abs (- y 2))) ((> y 0) y)))
+	'face 'linum)))
 
 (defadvice linum-update (around my-linum-update)
-  (let ((my-linum-current-line-number (line-number-at-pos)))
+(let ((my-linum-current-line-number (line-number-at-pos)))
     ad-do-it))
+
+;; Turn it on
 (ad-activate 'linum-update)
+
+;; Disable line numbers for some modes
+(dolist (mode '(org-mode-hook
+		term-mode-hook
+		shell-mode-hook
+		eshell-mode-hook))
+  (add-hook mode (lambda () (linum-mode 0))))
 
 ;; Turn off UI junk
 (column-number-mode)
-(global-linum-mode t)
 (scroll-bar-mode -1)
 (menu-bar-mode -1)
 (tool-bar-mode -1)
+
+(use-package doom-modeline
+  :ensure t
+  :init (doom-modeline-mode 1))
 
 (global-visual-line-mode t) ;; Wraps lines everywhere
 (line-number-mode t) ;; Line numbers in the gutter
@@ -77,52 +90,41 @@
 (use-package org
   :defer t
   :config
-  (setq org-ellipsis " ▾"
-      org-src-fontify-natively t
-      org-fontify-quote-and-verse-blocks t))
-
-  (setq org-todo-keywords
-  '((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d!)")
-      (sequence "|" "WAIT(w)" "SOME(b)")))
-
-  ;; TODO: org-todo-keyword-faces
-  (setq org-todo-keyword-faces
-  '(("NEXT" . (:foreground "orange red" :weight bold))
-      ("WAIT" . (:foreground "HotPink2" :weight bold))
-      ("SOME" . (:foreground "MediumPurple3" :weight bold))))
+    (setq org-edit-src-content-indentation 2
+          org-hide-block-startup nil))
 
 (use-package evil
-  :init
-  (setq evil-want-keybinding nil)
-  :config
-  (evil-mode 1))
+   :init
+   (setq evil-want-keybinding nil)
+   :config
+   (evil-mode 1))
 
-;; Gives me vim bindings elsewhere in emacs
-(use-package evil-collection
-  :after evil
-  :config
-  (evil-collection-init))
+ ;; Gives me vim bindings elsewhere in emacs
+ (use-package evil-collection
+   :after evil
+   :config
+   (evil-collection-init))
 
-;; Keybindings in org mode
-(use-package evil-org
-  :after org
-  :hook (org-mode . (lambda () evil-org-mode))
-  :config
-  (require 'evil-org-agenda)
-  (evil-org-agenda-set-keys))
+ ;; Keybindings in org mode
+;; (use-package evil-org
+ ;;  :after org
+  ;; :hook (org-mode . (lambda () evil-org-mode))
+  ;; :config
+  ;; (require 'evil-org-agenda)
+  ;; (evil-org-agenda-set-keys))
 
-;; Branching undo system
-(use-package undo-tree
-  :after evil
-  :diminish 
-  :config
-  (evil-set-undo-system 'undo-tree)
-  (global-undo-tree-mode 1))
+ ;; Branching undo system
+ (use-package undo-tree
+   :after evil
+   :diminish 
+   :config
+   (evil-set-undo-system 'undo-tree)
+   (global-undo-tree-mode 1))
 
-;; Undo/redo each motion
-(setq evil-want-fine-undo 'fine)
-;; Use esc as cancel key everywhere
-(global-set-key (kbd "<escape>") 'keyboard-escape-quit)
+ ;; Undo/redo each motion
+ (setq evil-want-fine-undo 'fine)
+ ;; Use esc as cancel key everywhere
+ (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 
 (use-package ivy
   :diminish
