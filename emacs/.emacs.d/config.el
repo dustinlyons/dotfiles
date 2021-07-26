@@ -38,8 +38,8 @@
 ;; straight.el uses git packages, instead of the default bin files, which we like
 (setq straight-use-package-by-default t)
 
-(add-to-list 'custom-theme-load-path "~/.dotfiles/emacs/.emacs.d/themes")
-(load-theme 'dracula t)
+(use-package doom-themes
+  :init (load-theme 'doom-dracula t))
 
 (setq use-dialog-box nil
     use-file-dialog nil
@@ -82,6 +82,8 @@
 (use-package rainbow-delimiters
   :hook (prog-mode . rainbow-delimiters-mode))
 
+;; Run M-x all-the-icons-install-fonts to install
+(use-package all-the-icons)
 (use-package doom-modeline
   :ensure t
   :init (doom-modeline-mode 1))
@@ -96,11 +98,33 @@
     (setq org-edit-src-content-indentation 2
           org-hide-block-startup nil))
 
+(defun dl/evil-hook ()
+  (dolist (mode '(eshell-mode
+		  git-rebase-mode
+		  term-mode))
+  (add-to-list 'evil-emacs-state-modes mode))) ;; no evil mode for these modes
+
 (use-package evil
   :init
+  (setq evil-want-integration t) ;; TODO: research what this does
   (setq evil-want-keybinding nil)
+  (setq evil-want-fine-undo 'fine) ;; undo/redo each motion 
+  (setq evil-want-Y-yank-to-eol t) ;; Y copies to end of line like vim
+  (setq evil-want-C-u-scroll t) ;; vim like scroll up
+  :hook (evil-mode . dl/evil-hook)
   :config
-  (evil-mode 1))
+  (evil-mode 1)
+
+  ;; Emacs "cancel" == vim "cancel"
+  (define-key evil-insert-state-map (kbd "C-g") 'evil-normal-state)
+  ;; Ctrl-h deletes in vim insert mode
+  (define-key evil-insert-state-map (kbd "C-h") 'evil-delete-backward-char-and-join)
+  ;; When we wrap lines, jump visually, not to the "actual" next line
+  (evil-global-set-key 'motion "j" 'evil-next-visual-line)
+  (evil-global-set-key 'motion "k" 'evil-previous-visual-line)
+
+  (evil-set-initial-state 'message-buffer-mode 'normal)
+  (evil-set-initial-state 'dashboard-mode 'normal))
 
 ;; Gives me vim bindings elsewhere in emacs
 (use-package evil-collection
@@ -124,10 +148,16 @@
   (evil-set-undo-system 'undo-tree)
   (global-undo-tree-mode 1))
 
-;; Undo/redo each motion
-(setq evil-want-fine-undo 'fine)
-;; Use esc as cancel key everywhere
-(global-set-key (kbd "<escape>") 'keyboard-escape-quit)
+(use-package general
+  :config
+  (general-create-definer dl/leader-keys
+    :keymaps '(normal insert visual emacs)
+    :prefix ",")
+
+  (dl/leader-keys
+    "tt" '(counsel-load-theme :which-key "choose theme")
+    "<escape>" '(keyboard-escape-quit :which-key "quit")
+    "C-M-j" '(counsel-switch-buffer :which-key "switch buffer")))
 
 (use-package ivy
   :diminish

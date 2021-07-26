@@ -16,15 +16,6 @@ In late 2020, I discovered Roam and the movement behind networked notes, or "sma
 
 However, these ideas weren't unique to Roam. I began to look at others, and I quickly found problem with the available tools on the market. I began to look at open source equivalents and found org-roam. Given vim's modal editing was foundational to my life many years ago, this gave me an excuse to make the leap over to kick the tires on _evil mode_ and test a new wn workflow. Once I peaked into everything emacs had to offer, I was hooked.
 
-It's pretty clear that the vim vs emacs battle is over, and the real winner
-is emacs with evil mode
-
-** For the reader
-For the reader, here are some useful facts to aid in your understanding of this configuration:
-
-- The _t_ variable stands for _true_, and is used with _nil_ to form boolean operations.
-- "Evil mode" is essentially vim, inside emacs. It's the best of both worlds.
-
 :PROPERTIES:
 :CUSTOM_ID: babel-init
 :END:
@@ -104,9 +95,8 @@ Some my own, some from others.
 
 #+NAME: themes
 #+BEGIN_SRC emacs-lisp 
-  (add-to-list 'custom-theme-load-path "~/.dotfiles/emacs/.emacs.d/themes")
-  (use-package doom-themes)
-  (load-theme 'dracula t)
+  (use-package doom-themes
+    :init (load-theme 'doom-dracula t))
 #+END_SRC
 
 *** Windows
@@ -186,6 +176,8 @@ These are generally helpful in providing additional information when needed, or 
 **** "Powerline"
 #+NAME: modeline
 #+BEGIN_SRC emacs-lisp 
+  ;; Run M-x all-the-icons-install-fonts to install
+  (use-package all-the-icons)
   (use-package doom-modeline
     :ensure t
     :init (doom-modeline-mode 1))
@@ -214,18 +206,39 @@ If you haven't heard of org mode, go watch [[https://www.youtube.com/watch?v=SzA
           org-hide-block-startup nil))
 #+END_SRC
 
-
 ** Evil mode
 *** Vim inside emacs
 This is what makes emacs possible for me. All evil mode packages and related configuration.
 
 #+NAME: evil-packages
 #+BEGIN_SRC emacs-lisp 
+  (defun dl/evil-hook ()
+    (dolist (mode '(eshell-mode
+		    git-rebase-mode
+		    term-mode))
+    (add-to-list 'evil-emacs-state-modes mode))) ;; no evil mode for these modes
+
   (use-package evil
     :init
+    (setq evil-want-integration t) ;; TODO: research what this does
     (setq evil-want-keybinding nil)
+    (setq evil-want-fine-undo 'fine) ;; undo/redo each motion 
+    (setq evil-want-Y-yank-to-eol t) ;; Y copies to end of line like vim
+    (setq evil-want-C-u-scroll t) ;; vim like scroll up
+    :hook (evil-mode . dl/evil-hook)
     :config
-    (evil-mode 1))
+    (evil-mode 1)
+
+    ;; Emacs "cancel" == vim "cancel"
+    (define-key evil-insert-state-map (kbd "C-g") 'evil-normal-state)
+    ;; Ctrl-h deletes in vim insert mode
+    (define-key evil-insert-state-map (kbd "C-h") 'evil-delete-backward-char-and-join)
+    ;; When we wrap lines, jump visually, not to the "actual" next line
+    (evil-global-set-key 'motion "j" 'evil-next-visual-line)
+    (evil-global-set-key 'motion "k" 'evil-previous-visual-line)
+
+    (evil-set-initial-state 'message-buffer-mode 'normal)
+    (evil-set-initial-state 'dashboard-mode 'normal))
 
   ;; Gives me vim bindings elsewhere in emacs
   (use-package evil-collection
@@ -249,11 +262,21 @@ This is what makes emacs possible for me. All evil mode packages and related con
     (evil-set-undo-system 'undo-tree)
     (global-undo-tree-mode 1))
 
-  ;; Undo/redo each motion
-  (setq evil-want-fine-undo 'fine)
-  ;; Use esc as cancel key everywhere
-  (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
+#+END_SRC
 
+** Keybindings
+#+NAME: keybindings
+#+BEGIN_SRC emacs-lisp 
+  (use-package general
+    :config
+    (general-create-definer dl/leader-keys
+      :keymaps '(normal insert visual emacs)
+      :prefix ",")
+
+    (dl/leader-keys
+      "tt" '(counsel-load-theme :which-key "choose theme")
+      "<escape>" '(keyboard-escape-quit :which-key "quit")
+      "C-M-j" '(counsel-switch-buffer :which-key "switch buffer")))
 #+END_SRC
 
 ** Managing files
