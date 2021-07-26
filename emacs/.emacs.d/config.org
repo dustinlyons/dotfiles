@@ -7,7 +7,7 @@ Last exported:  {{{modification-time(%Y-%m-%d %H:%M)}}}
 
 * Configuration   :emacs:
 ** About this file
-This is my emacs config file. Yes, in emacs you can write configuration in the same way you would write a Google Doc and get away with it.
+This is my emacs config file. Yes, in emacs you can write configuration like a Google Doc and get away with it. It's called "literate programming".
 
 ** Background
 As of July 13, 2021, I'm a recent vim expact. What led me here, you may ask?
@@ -105,6 +105,7 @@ Some my own, some from others.
 #+NAME: themes
 #+BEGIN_SRC emacs-lisp 
   (add-to-list 'custom-theme-load-path "~/.dotfiles/emacs/.emacs.d/themes")
+  (use-package doom-themes)
   (load-theme 'dracula t)
 #+END_SRC
 
@@ -123,6 +124,7 @@ Sets some reasonable defaults.
 Turns off the various menu bars, they're quite ugly.
 
 ***** Fonts
+#+NAME: fonts
 #+BEGIN_SRC emacs-lisp 
 (set-face-attribute 'default nil :font "Hack" :height 100)
 #+END_SRC
@@ -171,7 +173,17 @@ I like these window related minor modes.
   (tool-bar-mode -1)
 #+END_SRC
 
-**** "Powerline
+**** Helpful UI related packages
+These are generally helpful in providing additional information when needed, or otherwise making me more efficeient.
+
+***** Rainbow delmiters
+#+NAME: rainbow-delmiters
+#+BEGIN_SRC emacs-lisp 
+  (use-package rainbow-delimiters
+    :hook (prog-mode . rainbow-delimiters-mode))
+#+END_SRC
+
+**** "Powerline"
 #+NAME: modeline
 #+BEGIN_SRC emacs-lisp 
   (use-package doom-modeline
@@ -222,12 +234,12 @@ This is what makes emacs possible for me. All evil mode packages and related con
     (evil-collection-init))
 
   ;; Keybindings in org mode
- ;; (use-package evil-org
-  ;;  :after org
-   ;; :hook (org-mode . (lambda () evil-org-mode))
-   ;; :config
-   ;; (require 'evil-org-agenda)
-   ;; (evil-org-agenda-set-keys))
+  (use-package evil-org
+    :after org
+    :hook (org-mode . (lambda () evil-org-mode))
+    :config
+    (require 'evil-org-agenda)
+    (evil-org-agenda-set-keys))
 
   ;; Branching undo system
   (use-package undo-tree
@@ -279,8 +291,7 @@ File finder and associated helpers that uses the minibuffer (the info window at 
   :bind (("M-x" . counsel-M-x)
          ("C-x b" . counsel-ibuffer)
          ("C-x C-f" . counsel-find-file)
-         ;; ("C-M-j" . counsel-switch-buffer)
-         ("C-M-l" . counsel-imenu)
+         ("C-M-j" . counsel-switch-buffer)
          :map minibuffer-local-map
          ("C-r" . 'counsel-minibuffer-history))
   :custom
@@ -303,18 +314,53 @@ File finder and associated helpers that uses the minibuffer (the info window at 
 #+END_SRC
 
 ** Learning emacs
+These packages may come and go, but ultimately aid in my understanding of emacs and emacslisp.
+
 *** Indent org-babel source blocks
 #+BEGIN_SRC emacs-lisp 
   (setq org-src-tab-acts-natively t)
 #+END_SRC
 
-*** Show real time key bindings
-These packages may come and go, but ultimately aid in my understanding of emacs and emacslisp.
-
+*** Show real time key bindings in a seperate buffer
 #+NAME: utility-packages
 #+BEGIN_SRC emacs-lisp 
   ;; Gives me a fancy list of commands I run
   (use-package command-log-mode)
   (setq global-command-log-mode t)
   ;; TODO Install package that lets you define help screens for keymaps
+#+END_SRC
+
+*** Panel popup to show key bindings
+#+NAME: which-key
+#+BEGIN_SRC emacs-lisp 
+  ;; Gives me a fancy list of commands I run
+  (use-package which-key
+    :init (which-key-mode)
+    :diminish which-key-mode
+    :config
+    (setq which-key-idle-delay 0.3))
+#+END_SRC
+
+*** Helpful documentation strings for common functions
+#+NAME: ivy-rich
+#+BEGIN_SRC emacs-lisp 
+  (use-package ivy-rich
+    :init
+    (ivy-rich-mode 1))
+#+END_SRC
+
+#+NAME: helpful
+#+BEGIN_SRC emacs-lisp 
+  (use-package helpful
+    :custom
+    ;; Remap Counsel help functions
+    (counsel-describe-function-function #'helpful-callable)
+    (counsel-describe-variable-function #'helpful-variable)
+      :bind
+    ;; Remap default help functions
+    ([remap describe-function] . helpful-function)
+    ([remap describe-symbol] . helpful-symbol)
+    ([remap describe-variable] . helpful-variable)
+    ([remap describe-command] . helpful-command)
+    ([remap describe-key] . helpful-key)) 
 #+END_SRC

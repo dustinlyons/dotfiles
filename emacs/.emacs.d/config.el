@@ -79,6 +79,9 @@
 (menu-bar-mode -1)
 (tool-bar-mode -1)
 
+(use-package rainbow-delimiters
+  :hook (prog-mode . rainbow-delimiters-mode))
+
 (use-package doom-modeline
   :ensure t
   :init (doom-modeline-mode 1))
@@ -94,37 +97,37 @@
           org-hide-block-startup nil))
 
 (use-package evil
-   :init
-   (setq evil-want-keybinding nil)
-   :config
-   (evil-mode 1))
+  :init
+  (setq evil-want-keybinding nil)
+  :config
+  (evil-mode 1))
 
- ;; Gives me vim bindings elsewhere in emacs
- (use-package evil-collection
-   :after evil
-   :config
-   (evil-collection-init))
+;; Gives me vim bindings elsewhere in emacs
+(use-package evil-collection
+  :after evil
+  :config
+  (evil-collection-init))
 
- ;; Keybindings in org mode
-;; (use-package evil-org
- ;;  :after org
-  ;; :hook (org-mode . (lambda () evil-org-mode))
-  ;; :config
-  ;; (require 'evil-org-agenda)
-  ;; (evil-org-agenda-set-keys))
+;; Keybindings in org mode
+(use-package evil-org
+  :after org
+  :hook (org-mode . (lambda () evil-org-mode))
+  :config
+  (require 'evil-org-agenda)
+  (evil-org-agenda-set-keys))
 
- ;; Branching undo system
- (use-package undo-tree
-   :after evil
-   :diminish 
-   :config
-   (evil-set-undo-system 'undo-tree)
-   (global-undo-tree-mode 1))
+;; Branching undo system
+(use-package undo-tree
+  :after evil
+  :diminish 
+  :config
+  (evil-set-undo-system 'undo-tree)
+  (global-undo-tree-mode 1))
 
- ;; Undo/redo each motion
- (setq evil-want-fine-undo 'fine)
- ;; Use esc as cancel key everywhere
- (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
+;; Undo/redo each motion
+(setq evil-want-fine-undo 'fine)
+;; Use esc as cancel key everywhere
+(global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 
 (use-package ivy
   :diminish
@@ -155,8 +158,7 @@
   :bind (("M-x" . counsel-M-x)
          ("C-x b" . counsel-ibuffer)
          ("C-x C-f" . counsel-find-file)
-         ;; ("C-M-j" . counsel-switch-buffer)
-         ("C-M-l" . counsel-imenu)
+         ("C-M-j" . counsel-switch-buffer)
          :map minibuffer-local-map
          ("C-r" . 'counsel-minibuffer-history))
   :custom
@@ -178,3 +180,27 @@
 (use-package command-log-mode)
 (setq global-command-log-mode t)
 ;; TODO Install package that lets you define help screens for keymaps
+
+;; Gives me a fancy list of commands I run
+(use-package which-key
+  :init (which-key-mode)
+  :diminish which-key-mode
+  :config
+  (setq which-key-idle-delay 0.3))
+
+(use-package ivy-rich
+  :init
+  (ivy-rich-mode 1))
+
+(use-package helpful
+  :custom
+  ;; Remap Counsel help functions
+  (counsel-describe-function-function #'helpful-callable)
+  (counsel-describe-variable-function #'helpful-variable)
+    :bind
+  ;; Remap default help functions
+  ([remap describe-function] . helpful-function)
+  ([remap describe-symbol] . helpful-symbol)
+  ([remap describe-variable] . helpful-variable)
+  ([remap describe-command] . helpful-command)
+  ([remap describe-key] . helpful-key))
