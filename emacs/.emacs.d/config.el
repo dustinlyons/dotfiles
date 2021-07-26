@@ -38,6 +38,8 @@
 ;; straight.el uses git packages, instead of the default bin files, which we like
 (setq straight-use-package-by-default t)
 
+(use-package hydra)
+
 ;; ESC will also cancel/quit/etc.
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 (use-package general
@@ -82,9 +84,16 @@
 		eshell-mode-hook))
   (add-hook mode (lambda () (linum-mode 0))))
 
+(defhydra hydra-text-scale (:timeout 4)
+  "scale text"
+  ("j" text-scale-increase "in")
+  ("k" text-scale-decrease "out")
+  ("f" nil "finished" :exit t))
+
 (dl/leader-keys
   "t"  '(:ignore t :which-key "toggles")
-  "tt" '(counsel-load-theme :which-key "choose theme"))
+  "tt" '(counsel-load-theme :which-key "choose theme")
+  "ts" '(hydra-text-scale/body :which-key "scale text"))
 
 ;; Turn off UI junk
 (column-number-mode)

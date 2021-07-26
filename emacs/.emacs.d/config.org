@@ -88,6 +88,14 @@ I configure straight.el to automatically fetch packages over git via use-package
   ;; straight.el uses git packages, instead of the default bin files, which we like
   (setq straight-use-package-by-default t)
 #+END_SRC
+
+**** Hydra
+Hydra lets me drop into quick keybinding modes. See [[https://github.com/abo-abo/hydra][here]].
+
+#+BEGIN_SRC emacs-lisp
+  (use-package hydra)
+#+END_SRC
+
 ** Keybindings
 #+NAME: keybindings
 #+BEGIN_SRC emacs-lisp 
@@ -164,16 +172,23 @@ These functions define vim-style relative line numbers.
 #+END_SRC
 
 ***** Toggles
-Turn UI things on and off.
+Turn UI things on and off, scale things up and down.
 
 #+NAME: ui-toggles
 #+BEGIN_SRC emacs-lisp 
+  (defhydra hydra-text-scale (:timeout 4)
+    "scale text"
+    ("j" text-scale-increase "big")
+    ("k" text-scale-decrease "small")
+    ("q" nil "quit" :exit t))
+
   (dl/leader-keys
     "t"  '(:ignore t :which-key "toggles")
-    "tt" '(counsel-load-theme :which-key "choose theme"))
+    "tt" '(counsel-load-theme :which-key "choose theme")
+    "ts" '(hydra-text-scale/body :which-key "scale text"))
 #+END_SRC
 
-***** Modes
+***** Window minor modes
 I like these window related minor modes.
 
 #+NAME: windows-ui-settings
@@ -184,9 +199,6 @@ I like these window related minor modes.
   (menu-bar-mode -1)
   (tool-bar-mode -1)
 #+END_SRC
-
-**** Helpful UI related packages
-These are generally helpful in providing additional information when needed, or otherwise making me more efficeient.
 
 ***** Rainbow delmiters
 #+NAME: rainbow-delmiters
@@ -228,7 +240,7 @@ If you haven't heard of org mode, go watch [[https://www.youtube.com/watch?v=SzA
           org-hide-block-startup nil))
 #+END_SRC
 
-** Evil mode
+** Evil mode (Vim)
 *** Vim inside emacs
 This is what makes emacs possible for me. All evil mode packages and related configuration.
 
@@ -286,8 +298,10 @@ This is what makes emacs possible for me. All evil mode packages and related con
 
 #+END_SRC
 
-** Utility
+** Utility packages
 Various helpers.
+
+*** Google
 #+BEGIN_SRC emacs-lisp
   ;; You can probably guess
   (use-package google-this
