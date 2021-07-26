@@ -38,14 +38,23 @@
 ;; straight.el uses git packages, instead of the default bin files, which we like
 (setq straight-use-package-by-default t)
 
+;; ESC will also cancel/quit/etc.
+(global-set-key (kbd "<escape>") 'keyboard-escape-quit)
+(use-package general
+  :config
+  (general-evil-setup t)
+  (general-create-definer dl/leader-keys
+    :keymaps '(normal visual emacs)
+    :prefix ","))
+
 (use-package doom-themes
-  :init (load-theme 'doom-dracula t))
+  :init (load-theme 'doom-rouge t))
 
 (setq use-dialog-box nil
     use-file-dialog nil
     cursor-type 'bar)
 
-(set-face-attribute 'default nil :font "Hack" :height 100)
+(set-face-attribute 'default nil :font "Hack" :height 115)
 
 (global-linum-mode 1)
 (defvar my-linum-current-line-number 0)
@@ -67,11 +76,15 @@
 (ad-activate 'linum-update)
 
 ;; Disable line numbers for some modes
-(dolist (mode '(org-mode-hook
+(dolist (mode '(;;org-mode-hook		
 		term-mode-hook
 		shell-mode-hook
 		eshell-mode-hook))
   (add-hook mode (lambda () (linum-mode 0))))
+
+(dl/leader-keys
+  "t"  '(:ignore t :which-key "toggles")
+  "tt" '(counsel-load-theme :which-key "choose theme"))
 
 ;; Turn off UI junk
 (column-number-mode)
@@ -148,16 +161,10 @@
   (evil-set-undo-system 'undo-tree)
   (global-undo-tree-mode 1))
 
-(use-package general
+;; You can probably guess
+(use-package google-this
   :config
-  (general-create-definer dl/leader-keys
-    :keymaps '(normal insert visual emacs)
-    :prefix ",")
-
-  (dl/leader-keys
-    "tt" '(counsel-load-theme :which-key "choose theme")
-    "<escape>" '(keyboard-escape-quit :which-key "quit")
-    "C-M-j" '(counsel-switch-buffer :which-key "switch buffer")))
+  (google-this-mode 1))
 
 (use-package ivy
   :diminish
