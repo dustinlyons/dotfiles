@@ -1,4 +1,4 @@
 (package-initialize)
 
 (require 'org-install)
-(org-babel-load-file "~/.dotfiles/emacs/.emacs.d/config.org")
+(org-babel-load-file "~/Projects/Code/dotfiles/emacs/.emacs.d/config.org")
