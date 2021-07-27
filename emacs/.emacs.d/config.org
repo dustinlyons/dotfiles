@@ -57,8 +57,8 @@ This associates our package manager with the right source (MELPA).
 *** Packages
 Here we install some helpers and begin downloading some core packages.
 
-**** Install straight.el with use-package
-I configure straight.el to automatically fetch packages over git via use-package. I prefer git as it's easier to version any hacks.
+**** Straight.el
+Straight.el fetchs packages over git via use-package.
 
 #+NAME: straight-el
 #+BEGIN_SRC emacs-lisp
@@ -134,6 +134,7 @@ Sets some reasonable defaults.
 Turns off the various menu bars, they're quite ugly.
 
 ***** Fonts
+[[https://sourcefoundry.org/hack/][Hack]] is a code-friendly typeface. I really like it.
 #+NAME: fonts
 #+BEGIN_SRC emacs-lisp 
 (set-face-attribute 'default nil :font "Hack" :height 115)
@@ -203,6 +204,8 @@ I like these window related minor modes.
 #+END_SRC
 
 ***** Rainbow delmiters
+Makes my lisp parens pretty, and easy to spot.
+
 #+NAME: rainbow-delmiters
 #+BEGIN_SRC emacs-lisp 
   (use-package rainbow-delimiters
@@ -210,6 +213,8 @@ I like these window related minor modes.
 #+END_SRC
 
 **** "Powerline"
+Keeps info at my fingertips. Modeline is much better than Vim's Powerline (sorry Vim).
+
 #+NAME: modeline
 #+BEGIN_SRC emacs-lisp 
   ;; Run M-x all-the-icons-install-fonts to install
