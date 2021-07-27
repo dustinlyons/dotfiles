@@ -130,7 +130,7 @@ Sets some reasonable defaults.
       cursor-type 'bar)
 #+END_SRC
 
-**** UI configuration
+**** Display configuration
 Turns off the various menu bars, they're quite ugly.
 
 ***** Fonts
@@ -235,16 +235,44 @@ I like these modes.
 #+END_SRC
 
 ** Org mode
-*** My productivity workflow
+*** Package
 If you haven't heard of org mode, go watch [[https://www.youtube.com/watch?v=SzA2YODtgK4][this]] talk and come back when you are finished.
 
 #+NAME::org-mode
 #+BEGIN_SRC emacs-lisp 
-(use-package org
-  :defer t
-  :config
+  (use-package org
+    :defer t
+    :config
+    ;; Indent code blocks by 2
     (setq org-edit-src-content-indentation 2
-          org-hide-block-startup nil))
+	  ;; Prettify the fold indicator
+	  org-ellipsis " ▾"
+	  ;; Hide special characters
+	  org-hide-emphasis-markers t
+	  ;; Don't start org mode with blocks folded
+	  org-hide-block-startup nil))
+
+  (defun dl/org-mode-setup ()
+    (org-indent-mode)
+    (variable-pitch-mode 1)
+    (auto-fill-mode 0)
+    (visual-line-mode 1)
+    (setq evil-auto-indent nil))
+#+END_SRC
+
+*** Visual improvements
+Anything related to making org mode pretty.
+
+**** Superstar
+Replaces the standard org-mode header asterisks with dots.
+#+NAME::org-mode-visuals
+#+BEGIN_SRC emacs-lisp
+(use-package org-superstar
+  :after org
+  :hook (org-mode . org-superstar-mode)
+  :custom
+    (org-superstar-remove-leading-stars t)
+    (org-superstar-headline-bullets-list '("◉" "○" "●" "○" "▷" "▷" "▷")))
 #+END_SRC
 
 ** Evil mode (Vim)

@@ -117,8 +117,28 @@
 (use-package org
   :defer t
   :config
-    (setq org-edit-src-content-indentation 2
-          org-hide-block-startup nil))
+  ;; Indent code blocks by 2
+  (setq org-edit-src-content-indentation 2 
+	;; Prettify the fold indicator
+	org-ellipsis " ▾" 
+	;; Hide special characters
+	org-hide-emphasis-markers t 
+	;; Don't start org mode with blocks folded
+	org-hide-block-startup nil)) 
+
+(defun dl/org-mode-setup ()
+  (org-indent-mode)
+  (variable-pitch-mode 1)
+  (auto-fill-mode 0)
+  (visual-line-mode 1)
+  (setq evil-auto-indent nil))
+
+(use-package org-superstar
+  :after org
+  :hook (org-mode . org-superstar-mode)
+  :custom
+    (org-superstar-remove-leading-stars t)
+    (org-superstar-headline-bullets-list '("◉" "○" "●" "○" "▷" "▷" "▷")))
 
 (defun dl/evil-hook ()
   (dolist (mode '(eshell-mode
