@@ -4,10 +4,6 @@
 ;; Turn off the splash screen
 (setq inhibit-startup-screen t)
 
-;; CUSTOM FUNCTIONS, we load this file at the very end
-(setq custom-file "~/.emacs.d/local-config.org")
-(load custom-file t)
-
 (unless (assoc-default "melpa" package-archives)
   (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t))
 (unless (assoc-default "nongnu" package-archives)
@@ -86,9 +82,9 @@
 
 (defhydra hydra-text-scale (:timeout 4)
   "scale text"
-  ("j" text-scale-increase "in")
-  ("k" text-scale-decrease "out")
-  ("f" nil "finished" :exit t))
+  ("j" text-scale-increase "big")
+  ("k" text-scale-decrease "small")
+  ("q" nil "quit" :exit t))
 
 (dl/leader-keys
   "t"  '(:ignore t :which-key "toggles")
@@ -96,6 +92,8 @@
   "ts" '(hydra-text-scale/body :which-key "scale text"))
 
 ;; Turn off UI junk
+;; Note to future self: If you have problems with these later,
+;; move these into custom file and set variable custom-file
 (column-number-mode)
 (scroll-bar-mode -1)
 (menu-bar-mode -1)
@@ -175,22 +173,41 @@
   :config
   (google-this-mode 1))
 
+(let ((code_dir_path '"\"~/Projects/Code\""))
+(use-package projectile
+  :diminish projectile-mode
+  :config (projectile-mode)
+  :custom
+      ((projectile-completion-system 'ivy))
+    :bind-keymap
+      ("C-c p" . projectile-command-map)
+    :init
+      (when (file-directory-p code_dir_path)
+      (setq projectile-project-search-path '(code_dir_path)))
+	(setq projectile-switch-project-action #'projectile-dired))
+
+;; Gives me Ivy options in the Projectile menus
+(use-package counsel-projectile
+  :after projectile
+  :config (counsel-projectile-mode))
+)
+
 (use-package ivy
   :diminish
   :bind (("C-s" . swiper)
-         :map ivy-minibuffer-map
-         ("TAB" . ivy-alt-done)
-         ("C-f" . ivy-alt-done)
-         ("C-l" . ivy-alt-done)
-         ("C-j" . ivy-next-line)
-         ("C-k" . ivy-previous-line)
-         :map ivy-switch-buffer-map
-         ("C-k" . ivy-previous-line)
-         ("C-l" . ivy-done)
-         ("C-d" . ivy-switch-buffer-kill)
-         :map ivy-reverse-i-search-map
-         ("C-k" . ivy-previous-line)
-         ("C-d" . ivy-reverse-i-search-kill))
+	 :map ivy-minibuffer-map
+	 ("TAB" . ivy-alt-done)
+	 ("C-f" . ivy-alt-done)
+	 ("C-l" . ivy-alt-done)
+	 ("C-j" . ivy-next-line)
+	 ("C-k" . ivy-previous-line)
+	 :map ivy-switch-buffer-map
+	 ("C-k" . ivy-previous-line)
+	 ("C-l" . ivy-done)
+	 ("C-d" . ivy-switch-buffer-kill)
+	 :map ivy-reverse-i-search-map
+	 ("C-k" . ivy-previous-line)
+	 ("C-d" . ivy-reverse-i-search-kill))
   :init
   (ivy-mode 1)
   :config
@@ -202,15 +219,23 @@
 (use-package counsel
   :demand t
   :bind (("M-x" . counsel-M-x)
-         ("C-x b" . counsel-ibuffer)
-         ("C-x C-f" . counsel-find-file)
-         ("C-M-j" . counsel-switch-buffer)
-         :map minibuffer-local-map
-         ("C-r" . 'counsel-minibuffer-history))
+	 ("C-x b" . counsel-ibuffer)
+	 ("C-x C-f" . counsel-find-file)
+	 ("C-M-j" . counsel-switch-buffer)
+	 :map minibuffer-local-map
+	 ("C-r" . 'counsel-minibuffer-history))
   :custom
   (counsel-linux-app-format-function #'counsel-linux-app-format-function-name-only)
   :config
   (setq ivy-initial-inputs-alist nil)) ;; Don't start searches with ^
+
+(use-package magit
+  :commands (magit-status magit-get-current-branch))
+  ;;:custom
+  ;;(magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1))
+
+(use-package evil-magit
+  :after magit)
 
 ;; This uses Github Flavored Markdown for README files
 (use-package markdown-mode
