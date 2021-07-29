@@ -54,7 +54,20 @@
     use-file-dialog nil
     cursor-type 'bar)
 
-(set-face-attribute 'default nil :font "Hack" :height 115)
+;; Set the default pitch face
+(set-face-attribute 'default nil :font "Hack" :height 150)
+
+;; Set the fixed pitch face
+(set-face-attribute 'fixed-pitch nil
+  :font "Hack"
+  :weight 'light
+  :height 140)
+
+;; Set the variable pitch face
+(set-face-attribute 'variable-pitch nil
+  :font "SF Pro Display"
+  :height 120
+  :weight 'light)
 
 (global-linum-mode 1)
 (defvar my-linum-current-line-number 0)
@@ -114,18 +127,6 @@
 (line-number-mode t) ;; Line numbers in the gutter
 (show-paren-mode t) ;; Highlights parans for me
 
-(use-package org
-  :defer t
-  :config
-  ;; Indent code blocks by 2
-  (setq org-edit-src-content-indentation 2 
-	;; Prettify the fold indicator
-	org-ellipsis " ▾" 
-	;; Hide special characters
-	org-hide-emphasis-markers t 
-	;; Don't start org mode with blocks folded
-	org-hide-block-startup nil)) 
-
 (defun dl/org-mode-setup ()
   (org-indent-mode)
   (variable-pitch-mode 1)
@@ -133,12 +134,43 @@
   (visual-line-mode 1)
   (setq evil-auto-indent nil))
 
+(use-package org
+  :defer t
+  :hook (org-mode . dl/org-mode-setup)
+  :config
+  ;; Indent code blocks by 2
+  (setq org-edit-src-content-indentation 2
+	;; Prettify the fold indicator
+	org-ellipsis " ▾"
+	;; Hide special characters
+	org-hide-emphasis-markers t
+	;; Don't start org mode with blocks folded
+	org-hide-block-startup nil))
+
 (use-package org-superstar
   :after org
   :hook (org-mode . org-superstar-mode)
   :custom
     (org-superstar-remove-leading-stars t)
     (org-superstar-headline-bullets-list '("◉" "○" "●" "○" "▷" "▷" "▷")))
+
+;; Make sure org-indent face is available
+(require 'org-indent)
+
+;; Ensure that anything that should be fixed-pitch in Org files appears that way
+(set-face-attribute 'org-block nil :foreground nil :inherit 'fixed-pitch)
+(set-face-attribute 'org-table nil  :inherit 'fixed-pitch)
+(set-face-attribute 'org-formula nil  :inherit 'fixed-pitch)
+(set-face-attribute 'org-code nil   :inherit '(shadow fixed-pitch))
+(set-face-attribute 'org-indent nil :inherit '(org-hide fixed-pitch))
+(set-face-attribute 'org-verbatim nil :inherit '(shadow fixed-pitch))
+(set-face-attribute 'org-special-keyword nil :inherit '(font-lock-comment-face fixed-pitch))
+(set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
+(set-face-attribute 'org-checkbox nil :inherit 'fixed-pitch)
+
+;; Get rid of the background on column views
+(set-face-attribute 'org-column nil :background nil)
+(set-face-attribute 'org-column-title nil :background nil)
 
 (defun dl/evil-hook ()
   (dolist (mode '(eshell-mode

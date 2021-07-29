@@ -8,19 +8,7 @@ Lcode_dir_pathast exported:  {{{modification-time(%Y-%m-%d %H:%M)}}}
 
 * Configuration   :emacs:
 ** About this file
-This is my emacs config file. Yes, in emacs you can write configuration like a Google Doc and get away with it. It's called "literate programming".
-
-** Background
-As of July 13, 2021, I'm a recent vim expact. What led me here, you may ask?
-
-In late 2020, I discovered Roam and the movement behind networked notes, or "smart notes" aka Zettlekasten. I was writing in a style that made sense to my brain, and I was more focused on recording ideas for my future self to rediscover, instead of just being buried away in a folder. This was foundational as it enabled me to create more leverage.
-
-However, these ideas weren't unique to Roam. I began to look at others, and I quickly found problem with the available tools on the market. I began to look at open source equivalents and found org-roam. Given vim's modal editing was foundational to my life many years ago, this gave me an excuse to make the leap over to kick the tires on _evil mode_ and test a new wn workflow. Once I peaked into everything emacs had to offer, I was hooked.
-
-:PROPERTIES:
-:CUSTOM_ID: babel-init
-:END:
-<<babel-init>>
+This is my emacs config file. Yes, in emacs you can write configuration like a Google Doc and get away with it. It's called [[https://en.wikipedia.org/wiki/Literate_programming]["literate programming"]].
 
 ** Personal information
 Just me!
@@ -135,9 +123,23 @@ Turns off the various menu bars, they're quite ugly.
 
 ***** Fonts
 [[https://sourcefoundry.org/hack/][Hack]] is a code-friendly typeface. I really like it.
+
 #+NAME: fonts
 #+BEGIN_SRC emacs-lisp 
-(set-face-attribute 'default nil :font "Hack" :height 115)
+  ;; Set the default pitch face
+  (set-face-attribute 'default nil :font "Hack" :height 150)
+
+  ;; Set the fixed pitch face
+  (set-face-attribute 'fixed-pitch nil
+    :font "Hack"
+    :weight 'light
+    :height 140)
+
+  ;; Set the variable pitch face
+  (set-face-attribute 'variable-pitch nil
+    :font "SF Pro Display"
+    :height 120
+    :weight 'light)
 #+END_SRC
 
 ***** Line numbers
@@ -154,8 +156,8 @@ These functions define vim-style relative line numbers.
   (let ((y (1+ (- line-number my-linum-current-line-number))))
       (propertize
       (number-to-string
-	  (cond ((<= y 0) (abs (- y 2))) ((> y 0) y)))
-	  'face 'linum)))
+          (cond ((<= y 0) (abs (- y 2))) ((> y 0) y)))
+          'face 'linum)))
 
   (defadvice linum-update (around my-linum-update)
   (let ((my-linum-current-line-number (line-number-at-pos)))
@@ -165,10 +167,10 @@ These functions define vim-style relative line numbers.
   (ad-activate 'linum-update)
 
   ;; Disable line numbers for some modes
-  (dolist (mode '(;;org-mode-hook		
-		  term-mode-hook
-		  shell-mode-hook
-		  eshell-mode-hook))
+  (dolist (mode '(org-mode-hook		
+                  term-mode-hook
+                  shell-mode-hook
+                  eshell-mode-hook))
     (add-hook mode (lambda () (linum-mode 0)))) 
 #+END_SRC
 
@@ -240,30 +242,32 @@ If you haven't heard of org mode, go watch [[https://www.youtube.com/watch?v=SzA
 
 #+NAME::org-mode
 #+BEGIN_SRC emacs-lisp 
-  (use-package org
-    :defer t
-    :config
-    ;; Indent code blocks by 2
-    (setq org-edit-src-content-indentation 2
-	  ;; Prettify the fold indicator
-	  org-ellipsis " ▾"
-	  ;; Hide special characters
-	  org-hide-emphasis-markers t
-	  ;; Don't start org mode with blocks folded
-	  org-hide-block-startup nil))
-
   (defun dl/org-mode-setup ()
     (org-indent-mode)
-    (variable-pitch-mode 1)
+    (variable-pitch-mode 0)
     (auto-fill-mode 0)
     (visual-line-mode 1)
     (setq evil-auto-indent nil))
+
+  (use-package org
+    :defer t
+    :hook (org-mode . dl/org-mode-setup)
+    :config
+    ;; Indent code blocks by 2
+    (setq org-edit-src-content-indentation 2
+          ;; Prettify the fold indicator
+          org-ellipsis " ▾"
+          ;; Hide special characters
+          org-hide-emphasis-markers t
+          ;; Don't start org mode with blocks folded
+          org-hide-block-startup nil))
+
 #+END_SRC
 
 *** Visual improvements
 Anything related to making org mode pretty.
 
-**** Superstar
+**** Change default bullets to be pretty
 Replaces the standard org-mode header asterisks with dots.
 #+NAME::org-mode-visuals
 #+BEGIN_SRC emacs-lisp
@@ -273,6 +277,27 @@ Replaces the standard org-mode header asterisks with dots.
   :custom
     (org-superstar-remove-leading-stars t)
     (org-superstar-headline-bullets-list '("◉" "○" "●" "○" "▷" "▷" "▷")))
+#+END_SRC
+
+#+NAME::org-mode-variable-width-fonts
+#+BEGIN_SRC emacs-lisp
+  ;; Make sure org-indent face is available
+  (require 'org-indent)
+
+  ;; Ensure that anything that should be fixed-pitch in Org files appears that way
+  (set-face-attribute 'org-block nil :foreground nil :inherit 'fixed-pitch)
+  (set-face-attribute 'org-table nil  :inherit 'fixed-pitch)
+  (set-face-attribute 'org-formula nil  :inherit 'fixed-pitch)
+  (set-face-attribute 'org-code nil   :inherit '(shadow fixed-pitch))
+  (set-face-attribute 'org-indent nil :inherit '(org-hide fixed-pitch))
+  (set-face-attribute 'org-verbatim nil :inherit '(shadow fixed-pitch))
+  (set-face-attribute 'org-special-keyword nil :inherit '(font-lock-comment-face fixed-pitch))
+  (set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
+  (set-face-attribute 'org-checkbox nil :inherit 'fixed-pitch)
+
+  ;; Get rid of the background on column views
+  (set-face-attribute 'org-column nil :background nil)
+  (set-face-attribute 'org-column-title nil :background nil)
 #+END_SRC
 
 ** Evil mode (Vim)
