@@ -19,7 +19,7 @@ Just me!
     user-mail-address "hello@dustinlyons.co")
 #+END_SRC
 
-** Starting up
+** Booting up
 Here's how we start:
 
 #+NAME: startup
@@ -42,8 +42,8 @@ This associates our package manager with the right source (MELPA).
     (add-to-list 'package-archives '("nongnu" . "https://elpa.nongnu.org/nongnu/") t))
 #+END_SRC
 
-*** Packages
-Here we install some helpers and begin downloading some core packages.
+*** Package managers
+Using straight.el under the hood of use-package enables us to download packages using git. This is preferred for easier hacking.
 
 **** Straight.el
 Straight.el fetchs packages over git via use-package.
@@ -74,14 +74,6 @@ Straight.el fetchs packages over git via use-package.
   ;; Tells (use-package) to use straight.el to download packages
   ;; straight.el uses git packages, instead of the default bin files, which we like
   (setq straight-use-package-by-default t)
-#+END_SRC
-
-**** Hydra
-Hydra enables me drop into quick keybinding modes. See [[https://github.com/abo-abo/hydra][here]].
-
-#+NAME: hydra
-#+BEGIN_SRC emacs-lisp
-  (use-package hydra)
 #+END_SRC
 
 ** Keybindings
@@ -237,7 +229,7 @@ I like these modes.
 #+END_SRC
 
 ** Org mode
-*** Package
+*** Install package
 If you haven't heard of org mode, go watch [[https://www.youtube.com/watch?v=SzA2YODtgK4][this]] talk and come back when you are finished.
 
 #+NAME::org-mode
@@ -264,7 +256,7 @@ If you haven't heard of org mode, go watch [[https://www.youtube.com/watch?v=SzA
 
 #+END_SRC
 
-*** Visual improvements
+*** UI improvements
 Anything related to making org mode pretty.
 
 **** Change default bullets to be pretty
@@ -301,7 +293,7 @@ Replaces the standard org-mode header asterisks with dots.
 #+END_SRC
 
 ** Evil mode (Vim)
-*** Vim inside emacs
+*** Install package
 This is what makes emacs possible for me. All evil mode packages and related configuration.
 
 #+NAME: evil-packages
@@ -360,6 +352,14 @@ This is what makes emacs possible for me. All evil mode packages and related con
 
 ** Utility packages
 Various helpers.
+
+*** Hydra
+Hydra enables me drop into quick keybinding modes. See [[https://github.com/abo-abo/hydra][here]].
+
+#+NAME: hydra
+#+BEGIN_SRC emacs-lisp
+(use-package hydra)
+#+END_SRC
 
 *** Google
 #+BEGIN_SRC emacs-lisp
