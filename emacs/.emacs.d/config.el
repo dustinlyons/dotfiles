@@ -66,7 +66,7 @@
 ;; Set the variable pitch face
 (set-face-attribute 'variable-pitch nil
   :font "SF Pro Display"
-  :height 120
+  :height 160
   :weight 'light)
 
 (global-linum-mode 1)
@@ -147,7 +147,7 @@
 
 (defun dl/org-mode-setup ()
   (org-indent-mode)
-  (variable-pitch-mode 0)
+  (variable-pitch-mode 1)
   (auto-fill-mode 0)
   (visual-line-mode 1)
   (setq evil-auto-indent nil))
@@ -189,12 +189,12 @@
 (set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
 (set-face-attribute 'org-checkbox nil :inherit 'fixed-pitch)
 
-(set-face-attribute 'org-document-title nil :font "SF Pro Display" :weight 'bold :height 1.3)
+(set-face-attribute 'org-document-title nil :font "SF Pro Display" :weight 'bold :height 1.2)
 (dolist (face '((org-level-1 . 1.2)
-                (org-level-2 . 1.1)
-                (org-level-3 . 1.05)
+                (org-level-2 . 1.15)
+                (org-level-3 . 1.1)
                 (org-level-4 . 1.05)
-                (org-level-5 . 1.0)
+                (org-level-5 . 1.05)
                 (org-level-6 . 1.0)
                 (org-level-7 . 1.0)
                 (org-level-8 . 1.0)))

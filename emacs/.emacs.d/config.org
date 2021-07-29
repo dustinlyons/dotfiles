@@ -140,9 +140,8 @@ Turns off the various menu bars, they're quite ugly.
 
   ;; Set the variable pitch face
   (set-face-attribute 'variable-pitch nil
-    :font "SF Pro Display"
-    :height 160
-    :weight 'light)
+    :font "Helvetica"
+    :height 165)
 #+END_SRC
 
 ***** Line numbers
