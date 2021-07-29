@@ -19,8 +19,9 @@ Just me!
     user-mail-address "hello@dustinlyons.co")
 #+END_SRC
 
-** Booting up
-Here's how we start:
+** Initialization
+*** Booting up
+Anything I want to run before anything else goes here.
 
 #+NAME: startup
 #+BEGIN_SRC emacs-lisp 
@@ -28,7 +29,6 @@ Here's how we start:
   (setq inhibit-startup-screen t)
 #+END_SRC
 
-** Emacs initialization
 *** Add package sources
 This associates our package manager with the right source (MELPA).
 
@@ -288,6 +288,9 @@ If you haven't heard of org mode, go watch [[https://www.youtube.com/watch?v=SzA
     (setq org-edit-src-content-indentation 2
           ;; Prettify the fold indicator
           org-ellipsis " ▾"
+          ;; Agenda
+          org-agenda-files
+            '("~/Projects/Writing/OrgFiles/Tasks.org")
           ;; Hide special characters
           org-hide-emphasis-markers t
           ;; Don't start org mode with blocks folded
