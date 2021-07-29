@@ -77,6 +77,9 @@ Straight.el fetchs packages over git via use-package.
 #+END_SRC
 
 ** Keybindings
+*** Leader keys
+I use general.el to define groups of keybindings under my 'leader' definition. [[https://medium.com/usevim/vim-101-what-is-the-leader-key-f2f5c1fa610f][Here]] is a good explanation on leader keys.
+
 #+NAME: keybindings
 #+BEGIN_SRC emacs-lisp 
   ;; ESC will also cancel/quit/etc.
@@ -87,6 +90,14 @@ Straight.el fetchs packages over git via use-package.
     (general-create-definer dl/leader-keys
       :keymaps '(normal visual emacs)
       :prefix ","))
+#+END_SRC
+
+*** Hydra
+Hydra enables me drop into quick keybinding modes. See [[https://github.com/abo-abo/hydra][here]].
+
+#+NAME: hydra
+#+BEGIN_SRC emacs-lisp
+(use-package hydra)
 #+END_SRC
 
 ** Display options
@@ -119,7 +130,7 @@ Turns off the various menu bars, they're quite ugly.
 #+NAME: fonts
 #+BEGIN_SRC emacs-lisp 
   ;; Set the default pitch face
-  (set-face-attribute 'default nil :font "Hack" :height 150)
+  (set-face-attribute 'default nil :font "SF Pro Display" :height 165)
 
   ;; Set the fixed pitch face
   (set-face-attribute 'fixed-pitch nil
@@ -263,35 +274,31 @@ Anything related to making org mode pretty.
 Replaces the standard org-mode header asterisks with dots.
 #+NAME::org-mode-visuals
 #+BEGIN_SRC emacs-lisp
-(use-package org-superstar
-  :after org
-  :hook (org-mode . org-superstar-mode)
-  :custom
-    (org-superstar-remove-leading-stars t)
-    (org-superstar-headline-bullets-list '("◉" "○" "●" "○" "▷" "▷" "▷")))
+  (use-package org-superstar
+    :after org
+    :hook (org-mode . org-superstar-mode)
+    :custom
+      (org-superstar-remove-leading-stars t)
+      (org-superstar-headline-bullets-list '("◉" "○" "●" "○" "▷" "▷" "▷")))
+
+  (font-lock-add-keywords 'org-mode
+                          '(("^ *\\([-]\\) "
+                             (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))))
 #+END_SRC
 
+**** Improve fonts and visually distinguish document writing from code
 #+NAME::org-mode-variable-width-fonts
 #+BEGIN_SRC emacs-lisp
-  ;; Make sure org-indent face is available
-  (require 'org-indent)
-
-  ;; Ensure that anything that should be fixed-pitch in Org files appears that way
-  (set-face-attribute 'org-block nil :foreground nil :inherit 'fixed-pitch)
-  (set-face-attribute 'org-table nil  :inherit 'fixed-pitch)
-  (set-face-attribute 'org-formula nil  :inherit 'fixed-pitch)
-  (set-face-attribute 'org-code nil   :inherit '(shadow fixed-pitch))
-  (set-face-attribute 'org-indent nil :inherit '(org-hide fixed-pitch))
-  (set-face-attribute 'org-verbatim nil :inherit '(shadow fixed-pitch))
-  (set-face-attribute 'org-special-keyword nil :inherit '(font-lock-comment-face fixed-pitch))
-  (set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
-  (set-face-attribute 'org-checkbox nil :inherit 'fixed-pitch)
-
-  ;; Get rid of the background on column views
-  (set-face-attribute 'org-column nil :background nil)
-  (set-face-attribute 'org-column-title nil :background nil)
+(set-face-attribute 'org-block nil :foreground nil :inherit 'fixed-pitch)
+(set-face-attribute 'org-table nil  :inherit 'fixed-pitch)
+(set-face-attribute 'org-formula nil  :inherit 'fixed-pitch)
+(set-face-attribute 'org-code nil   :inherit '(shadow fixed-pitch))
+(set-face-attribute 'org-indent nil :inherit '(org-hide fixed-pitch))
+(set-face-attribute 'org-verbatim nil :inherit '(shadow fixed-pitch))
+(set-face-attribute 'org-special-keyword nil :inherit '(font-lock-comment-face fixed-pitch))
+(set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
+(set-face-attribute 'org-checkbox nil :inherit 'fixed-pitch)
 #+END_SRC
-
 ** Evil mode (Vim)
 *** Install package
 This is what makes emacs possible for me. All evil mode packages and related configuration.
@@ -352,14 +359,6 @@ This is what makes emacs possible for me. All evil mode packages and related con
 
 ** Utility packages
 Various helpers.
-
-*** Hydra
-Hydra enables me drop into quick keybinding modes. See [[https://github.com/abo-abo/hydra][here]].
-
-#+NAME: hydra
-#+BEGIN_SRC emacs-lisp
-(use-package hydra)
-#+END_SRC
 
 *** Google
 #+BEGIN_SRC emacs-lisp
@@ -515,3 +514,8 @@ These packages may come and go, but ultimately aid in my understanding of emacs 
     ([remap describe-command] . helpful-command)
     ([remap describe-key] . helpful-key)) 
 #+END_SRC
+
+
+- Test
+- Test
+- Test

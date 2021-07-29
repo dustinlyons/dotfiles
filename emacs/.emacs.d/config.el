@@ -36,8 +36,6 @@
 ;; straight.el uses git packages, instead of the default bin files, which we like
 (setq straight-use-package-by-default t)
 
-(use-package hydra)
-
 ;; ESC will also cancel/quit/etc.
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 (use-package general
@@ -46,6 +44,8 @@
   (general-create-definer dl/leader-keys
     :keymaps '(normal visual emacs)
     :prefix ","))
+
+(use-package hydra)
 
 (use-package doom-themes
   :init (load-theme 'doom-rouge t))
@@ -78,8 +78,8 @@
 (let ((y (1+ (- line-number my-linum-current-line-number))))
     (propertize
     (number-to-string
-	(cond ((<= y 0) (abs (- y 2))) ((> y 0) y)))
-	'face 'linum)))
+        (cond ((<= y 0) (abs (- y 2))) ((> y 0) y)))
+        'face 'linum)))
 
 (defadvice linum-update (around my-linum-update)
 (let ((my-linum-current-line-number (line-number-at-pos)))
@@ -89,10 +89,10 @@
 (ad-activate 'linum-update)
 
 ;; Disable line numbers for some modes
-(dolist (mode '(;;org-mode-hook		
-		term-mode-hook
-		shell-mode-hook
-		eshell-mode-hook))
+(dolist (mode '(org-mode-hook		
+                term-mode-hook
+                shell-mode-hook
+                eshell-mode-hook))
   (add-hook mode (lambda () (linum-mode 0))))
 
 (defhydra hydra-text-scale (:timeout 4)
@@ -129,7 +129,7 @@
 
 (defun dl/org-mode-setup ()
   (org-indent-mode)
-  (variable-pitch-mode 1)
+  (variable-pitch-mode 0)
   (auto-fill-mode 0)
   (visual-line-mode 1)
   (setq evil-auto-indent nil))
@@ -140,12 +140,12 @@
   :config
   ;; Indent code blocks by 2
   (setq org-edit-src-content-indentation 2
-	;; Prettify the fold indicator
-	org-ellipsis " ▾"
-	;; Hide special characters
-	org-hide-emphasis-markers t
-	;; Don't start org mode with blocks folded
-	org-hide-block-startup nil))
+        ;; Prettify the fold indicator
+        org-ellipsis " ▾"
+        ;; Hide special characters
+        org-hide-emphasis-markers t
+        ;; Don't start org mode with blocks folded
+        org-hide-block-startup nil))
 
 (use-package org-superstar
   :after org
@@ -154,23 +154,24 @@
     (org-superstar-remove-leading-stars t)
     (org-superstar-headline-bullets-list '("◉" "○" "●" "○" "▷" "▷" "▷")))
 
-;; Make sure org-indent face is available
-(require 'org-indent)
+  (font-lock-add-keywords 'org-mode
+                          '(("^ *\\([-]\\) "
+                             (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))))
 
-;; Ensure that anything that should be fixed-pitch in Org files appears that way
-(set-face-attribute 'org-block nil :foreground nil :inherit 'fixed-pitch)
-(set-face-attribute 'org-table nil  :inherit 'fixed-pitch)
-(set-face-attribute 'org-formula nil  :inherit 'fixed-pitch)
-(set-face-attribute 'org-code nil   :inherit '(shadow fixed-pitch))
-(set-face-attribute 'org-indent nil :inherit '(org-hide fixed-pitch))
-(set-face-attribute 'org-verbatim nil :inherit '(shadow fixed-pitch))
-(set-face-attribute 'org-special-keyword nil :inherit '(font-lock-comment-face fixed-pitch))
-(set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
-(set-face-attribute 'org-checkbox nil :inherit 'fixed-pitch)
-
-;; Get rid of the background on column views
-(set-face-attribute 'org-column nil :background nil)
-(set-face-attribute 'org-column-title nil :background nil)
+(custom-theme-set-faces
+ 'user
+ '(org-block ((t (:inherit fixed-pitch))))
+ '(org-code ((t (:inherit (shadow fixed-pitch)))))
+ '(org-document-info ((t (:foreground "dark orange"))))
+ '(org-document-info-keyword ((t (:inherit (shadow fixed-pitch)))))
+ '(org-indent ((t (:inherit (org-hide fixed-pitch)))))
+ '(org-link ((t (:foreground "royal blue" :underline t))))
+ '(org-meta-line ((t (:inherit (font-lock-comment-face fixed-pitch)))))
+ '(org-property-value ((t (:inherit fixed-pitch))) t)
+ '(org-special-keyword ((t (:inherit (font-lock-comment-face fixed-pitch)))))
+ '(org-table ((t (:inherit fixed-pitch :foreground "#83a598"))))
+ '(org-tag ((t (:inherit (shadow fixed-pitch) :weight bold :height 0.8))))
+ '(org-verbatim ((t (:inherit (shadow fixed-pitch))))))
 
 (defun dl/evil-hook ()
   (dolist (mode '(eshell-mode
