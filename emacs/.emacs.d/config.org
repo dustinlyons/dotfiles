@@ -130,7 +130,7 @@ Turns off the various menu bars, they're quite ugly.
 #+NAME: fonts
 #+BEGIN_SRC emacs-lisp 
   ;; Set the default pitch face
-  (set-face-attribute 'default nil :font "SF Pro Display" :height 165)
+  (set-face-attribute 'default nil :font "Hack" :height 140)
 
   ;; Set the fixed pitch face
   (set-face-attribute 'fixed-pitch nil
@@ -217,6 +217,35 @@ Makes my lisp parens pretty, and easy to spot.
     :hook (prog-mode . rainbow-delimiters-mode))
 #+END_SRC
 
+**** Set mode margins
+This is used primarily to center org mode text.
+#+BEGIN_SRC emacs-lisp 
+(defun dl/org-mode-visual-fill ()
+  (setq visual-fill-column-width 110
+        visual-fill-column-center-text t)
+  (visual-fill-column-mode 1))
+
+(use-package visual-fill-column
+  :defer t
+  :hook (org-mode . dl/org-mode-visual-fill))
+#+END_SRC
+
+**** Easy window motions with ace-window
+Predefine windows with hotkeys and jump to them.
+
+#+BEGIN_SRC emacs-lisp 
+(use-package ace-window
+  :bind (("M-o" . ace-window))
+  :custom
+  (aw-scope 'frame)
+  (aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l))
+  (aw-minibuffer-flag t)
+  :config
+  (ace-window-display-mode 1))
+#+END_SRC
+
+y window motions
+
 **** "Powerline"
 Keeps info at my fingertips. Modeline is much better than Vim's Powerline (sorry Vim).
 
@@ -289,6 +318,9 @@ Replaces the standard org-mode header asterisks with dots.
 **** Improve fonts and visually distinguish document writing from code
 #+NAME::org-mode-variable-width-fonts
 #+BEGIN_SRC emacs-lisp
+  ;; Not sure why this is needed, but the org-indent face "requires" it (pun)
+  (require 'org-indent)
+
   (set-face-attribute 'org-block nil :foreground nil :inherit 'fixed-pitch)
   (set-face-attribute 'org-table nil  :inherit 'fixed-pitch)
   (set-face-attribute 'org-formula nil  :inherit 'fixed-pitch)

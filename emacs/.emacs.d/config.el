@@ -55,7 +55,7 @@
     cursor-type 'bar)
 
 ;; Set the default pitch face
-(set-face-attribute 'default nil :font "Hack" :height 150)
+(set-face-attribute 'default nil :font "Hack" :height 140)
 
 ;; Set the fixed pitch face
 (set-face-attribute 'fixed-pitch nil
@@ -117,6 +117,24 @@
 (use-package rainbow-delimiters
   :hook (prog-mode . rainbow-delimiters-mode))
 
+(defun dl/org-mode-visual-fill ()
+  (setq visual-fill-column-width 110
+        visual-fill-column-center-text t)
+  (visual-fill-column-mode 1))
+
+(use-package visual-fill-column
+  :defer t
+  :hook (org-mode . dl/org-mode-visual-fill))
+
+(use-package ace-window
+  :bind (("M-o" . ace-window))
+  :custom
+  (aw-scope 'frame)
+  (aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l))
+  (aw-minibuffer-flag t)
+  :config
+  (ace-window-display-mode 1))
+
 ;; Run M-x all-the-icons-install-fonts to install
 (use-package all-the-icons)
 (use-package doom-modeline
@@ -154,24 +172,33 @@
     (org-superstar-remove-leading-stars t)
     (org-superstar-headline-bullets-list '("◉" "○" "●" "○" "▷" "▷" "▷")))
 
-  (font-lock-add-keywords 'org-mode
-                          '(("^ *\\([-]\\) "
-                             (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))))
+(font-lock-add-keywords 'org-mode
+                        '(("^ *\\([-]\\) "
+                           (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))))
 
-(custom-theme-set-faces
- 'user
- '(org-block ((t (:inherit fixed-pitch))))
- '(org-code ((t (:inherit (shadow fixed-pitch)))))
- '(org-document-info ((t (:foreground "dark orange"))))
- '(org-document-info-keyword ((t (:inherit (shadow fixed-pitch)))))
- '(org-indent ((t (:inherit (org-hide fixed-pitch)))))
- '(org-link ((t (:foreground "royal blue" :underline t))))
- '(org-meta-line ((t (:inherit (font-lock-comment-face fixed-pitch)))))
- '(org-property-value ((t (:inherit fixed-pitch))) t)
- '(org-special-keyword ((t (:inherit (font-lock-comment-face fixed-pitch)))))
- '(org-table ((t (:inherit fixed-pitch :foreground "#83a598"))))
- '(org-tag ((t (:inherit (shadow fixed-pitch) :weight bold :height 0.8))))
- '(org-verbatim ((t (:inherit (shadow fixed-pitch))))))
+;; Not sure why this is needed, but the org-indent face "requires" it (pun)
+(require 'org-indent)
+
+(set-face-attribute 'org-block nil :foreground nil :inherit 'fixed-pitch)
+(set-face-attribute 'org-table nil  :inherit 'fixed-pitch)
+(set-face-attribute 'org-formula nil  :inherit 'fixed-pitch)
+(set-face-attribute 'org-code nil   :inherit '(shadow fixed-pitch))
+(set-face-attribute 'org-indent nil :inherit '(org-hide fixed-pitch))
+(set-face-attribute 'org-verbatim nil :inherit '(shadow fixed-pitch))
+(set-face-attribute 'org-special-keyword nil :inherit '(font-lock-comment-face fixed-pitch))
+(set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
+(set-face-attribute 'org-checkbox nil :inherit 'fixed-pitch)
+
+(set-face-attribute 'org-document-title nil :font "SF Pro Display" :weight 'bold :height 1.3)
+(dolist (face '((org-level-1 . 1.2)
+                (org-level-2 . 1.1)
+                (org-level-3 . 1.05)
+                (org-level-4 . 1.05)
+                (org-level-5 . 1.0)
+                (org-level-6 . 1.0)
+                (org-level-7 . 1.0)
+                (org-level-8 . 1.0)))
+  (set-face-attribute (car face) nil :font "SF Pro Display" :weight 'medium :height (cdr face)))
 
 (defun dl/evil-hook ()
   (dolist (mode '(eshell-mode
