@@ -65,9 +65,8 @@
 
 ;; Set the variable pitch face
 (set-face-attribute 'variable-pitch nil
-  :font "SF Pro Display"
-  :height 160
-  :weight 'light)
+  :font "Helvetica"
+  :height 165)
 
 (global-linum-mode 1)
 (defvar my-linum-current-line-number 0)
@@ -160,6 +159,9 @@
   (setq org-edit-src-content-indentation 2
         ;; Prettify the fold indicator
         org-ellipsis " ▾"
+        ;; Agenda
+        org-agenda-files
+          '("~/Projects/Writing/OrgFiles/Tasks.org")
         ;; Hide special characters
         org-hide-emphasis-markers t
         ;; Don't start org mode with blocks folded

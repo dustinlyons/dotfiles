@@ -1,10 +1,6 @@
 #+TITLE: Dustin Lyons' emacs configuration
-#+OPTIONS: toc:nil h:4
 #+CONSTANTS: code_dir_path="~/Projects/Code"
-
-Lcode_dir_pathast exported:  {{{modification-time(%Y-%m-%d %H:%M)}}}
-
-#+TOC: headlines 4
+#+CONSTANTS: roam_dir_path="~/Projects/Writing/Roam"
 
 * Configuration   :emacs:
 ** About this file
@@ -345,6 +341,24 @@ Replaces the standard org-mode header asterisks with dots.
     (set-face-attribute (car face) nil :font "SF Pro Display" :weight 'medium :height (cdr face)))
 #+END_SRC
 
+** Roam
+#+NAME::org-mode-variable-width-fonts
+#+BEGIN_SRC emacs-lisp roam_dir_path=(org-table-get-constant "roam_dir_path")
+(use-package org-roam
+  :disabled t ;; Unitl I finish org-mode understanding, this stays off
+  :hook
+  (after-init . org-roam-mode)
+  :custom
+  (org-roam-directory roam_dir_path)
+  :bind (:map org-roam-mode-map
+              (("C-c r l" . org-roam)
+               ("C-c r f" . org-roam-find-file)
+               ("C-c r g" . org-roam-graph))
+              :map org-mode-map
+              (("C-c r i" . org-roam-insert))
+              (("C-c r I" . org-roam-insert-immediate))))
+#+END_SRC
+
 ** Evil mode (Vim)
 *** Install package
 This is what makes emacs possible for me. All evil mode packages and related configuration.
@@ -354,8 +368,8 @@ This is what makes emacs possible for me. All evil mode packages and related con
 
   (defun dl/evil-hook ()
     (dolist (mode '(eshell-mode
-		    git-rebase-mode
-		    term-mode))
+                    git-rebase-mode
+                    term-mode))
     (add-to-list 'evil-emacs-state-modes mode))) ;; no evil mode for these modes
 
   (use-package evil
