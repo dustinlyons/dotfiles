@@ -203,18 +203,18 @@
   (set-face-attribute (car face) nil :font "SF Pro Display" :weight 'medium :height (cdr face)))
 
 (use-package org-roam
+  :init
+    (setq org-roam-v2-ack t) ;; Turn off v2 warning
   :hook (after-init . org-roam-mode)
   :custom
-    (org-roam-directory (file-truename "~/Projects/Writing/Roam")
-    (org-roam-dailies-directory "daily/"))
+    (org-roam-directory "~/Projects/Writing/Roam/")
+    (org-roam-dailies-directory "daily/")
   :bind (:map org-roam-mode-map
               (("C-c r l" . org-roam)
                ("C-c r f" . org-roam-find-file)
                ("C-c r g" . org-roam-graph))
               :map org-mode-map
-              (("C-c r i" . org-roam-insert))
-              (("C-c r I" . org-roam-insert-immediate))))
-(setq org-roam-v2-ack t) ;; Turn off v2 warning
+              (("C-c r i" . org-roam-node-insert))))
 
 (setq org-roam-dailies-capture-templates
   '(("d" "default" entry
