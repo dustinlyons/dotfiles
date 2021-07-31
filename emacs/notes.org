@@ -1,0 +1,29 @@
+* org-roam to capture daily notes
+  - each day, starts with a date and a basic log template
+  - I take notes and easy shortcut to link and open new pages
+    - This means I can write a projects "main" page with links to
+      project pages
+    - These projects will have todos
+  - Daily notes will have todos
+    
+* how to recreate the "sidebar" or bookmarks?
+  - need bookmarks for inbox of notes, 
+  - shortcuts under ctrl-x? show up in panel?
+    
+* org-roam to capture "second brain" 
+  - daily note when you open emacs with special command?
+  
+* org-agenda to view next actions vs org-ql pages
+  - projects list
+    can we open the doc the header is on from org-agenda?
+
+* org-capture templates to input
+  - new todo "inbox" items
+  - new projects
+
+* org-mode for recurring tasks
+  - use a 'Recurring.org' within your second brain
+
+----
+
+later: readwise flow
