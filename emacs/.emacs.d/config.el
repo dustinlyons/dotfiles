@@ -202,10 +202,30 @@
                 (org-level-8 . 1.0)))
   (set-face-attribute (car face) nil :font "SF Pro Display" :weight 'medium :height (cdr face)))
 
+(use-package org-roam
+  :hook (after-init . org-roam-mode)
+  :custom
+    (org-roam-directory (file-truename "~/Projects/Writing/Roam")
+    (org-roam-dailies-directory "daily/"))
+  :bind (:map org-roam-mode-map
+              (("C-c r l" . org-roam)
+               ("C-c r f" . org-roam-find-file)
+               ("C-c r g" . org-roam-graph))
+              :map org-mode-map
+              (("C-c r i" . org-roam-insert))
+              (("C-c r I" . org-roam-insert-immediate))))
+(setq org-roam-v2-ack t) ;; Turn off v2 warning
+
+(setq org-roam-dailies-capture-templates
+  '(("d" "default" entry
+     "* %?"
+     :if-new (file+head "%<%Y-%m-%d>.org"
+                        "#+title: %<%Y-%m-%d>\n"))))
+
 (defun dl/evil-hook ()
   (dolist (mode '(eshell-mode
-		  git-rebase-mode
-		  term-mode))
+                  git-rebase-mode
+                  term-mode))
   (add-to-list 'evil-emacs-state-modes mode))) ;; no evil mode for these modes
 
 (use-package evil
@@ -328,6 +348,14 @@
     ("\\.md\\'" . markdown-mode)
     ("\\.markdown\\'" . markdown-mode))
   :init (setq markdown-command "multimarkdown"))
+
+(setq backup-directory-alist '(("." . "~/.emacs.d/backup"))
+  backup-by-copying t    ; Don't delink hardlinks
+  version-control t      ; Use version numbers on backups
+  delete-old-versions t  ; Automatically delete excess backups
+  kept-new-versions 20   ; how many of the newest versions to keep
+  kept-old-versions 5    ; and how many of the old
+  )
 
 (setq org-src-tab-acts-natively t)
 

@@ -1,6 +1,5 @@
 #+TITLE: Dustin Lyons' emacs configuration
 #+CONSTANTS: code_dir_path="~/Projects/Code"
-#+CONSTANTS: roam_dir_path="~/Projects/Writing/Roam"
 
 * Configuration   :emacs:
 ** About this file
@@ -342,21 +341,32 @@ Replaces the standard org-mode header asterisks with dots.
 #+END_SRC
 
 ** Roam
-#+NAME::org-mode-variable-width-fonts
-#+BEGIN_SRC emacs-lisp roam_dir_path=(org-table-get-constant "roam_dir_path")
-(use-package org-roam
-  :disabled t ;; Unitl I finish org-mode understanding, this stays off
-  :hook
-  (after-init . org-roam-mode)
-  :custom
-  (org-roam-directory roam_dir_path)
-  :bind (:map org-roam-mode-map
-              (("C-c r l" . org-roam)
-               ("C-c r f" . org-roam-find-file)
-               ("C-c r g" . org-roam-graph))
-              :map org-mode-map
-              (("C-c r i" . org-roam-insert))
-              (("C-c r I" . org-roam-insert-immediate))))
+*** Install package
+#+NAME::org-roam-package
+#+BEGIN_SRC emacs-lisp
+  (use-package org-roam
+    :hook (after-init . org-roam-mode)
+    :custom
+      (org-roam-directory (file-truename "~/Projects/Writing/Roam")
+      (org-roam-dailies-directory "daily/"))
+    :bind (:map org-roam-mode-map
+                (("C-c r l" . org-roam)
+                 ("C-c r f" . org-roam-find-file)
+                 ("C-c r g" . org-roam-graph))
+                :map org-mode-map
+                (("C-c r i" . org-roam-insert))
+                (("C-c r I" . org-roam-insert-immediate))))
+  (setq org-roam-v2-ack t) ;; Turn off v2 warning
+#+END_SRC
+
+*** Configure templates
+#+NAME::org-roam-templates
+#+BEGIN_SRC emacs-lisp
+  (setq org-roam-dailies-capture-templates
+    '(("d" "default" entry
+       "* %?"
+       :if-new (file+head "%<%Y-%m-%d>.org"
+                          "#+title: %<%Y-%m-%d>\n"))))
 #+END_SRC
 
 ** Evil mode (Vim)
@@ -509,11 +519,9 @@ File finder and associated helpers that uses the minibuffer (the info window at 
     :after magit)
 #+END_SRC
 
-#+RESULTS: file-finder
-
 *** File types
 **** Markdown mode
-#+NAME::markdown-mode
+#+NAME: markdown-mode
 #+BEGIN_SRC emacs-lisp 
   ;; This uses Github Flavored Markdown for README files
   (use-package markdown-mode
@@ -524,8 +532,20 @@ File finder and associated helpers that uses the minibuffer (the info window at 
     :init (setq markdown-command "multimarkdown"))
 #+END_SRC
 
+** Auto-save and backup
+#+NAME: auto-save
+#+BEGIN_SRC emacs-lisp 
+  (setq backup-directory-alist '(("." . "~/.emacs.d/backup"))
+    backup-by-copying t    ; Don't delink hardlinks
+    version-control t      ; Use version numbers on backups
+    delete-old-versions t  ; Automatically delete excess backups
+    kept-new-versions 20   ; how many of the newest versions to keep
+    kept-old-versions 5    ; and how many of the old
+    )
+#+END_SRC
+
 ** Learning emacs
-These packages may come and go, but ultimately aid in my understanding of emacs and emacslisp.
+These packages may come and go, but ultimately aid in my understanding of emacs and emacs lisp.
 
 *** Indent org-babel source blocks
 #+BEGIN_SRC emacs-lisp 
