@@ -252,11 +252,13 @@ Keeps info at my fingertips. Modeline is much better than Vim's Powerline (sorry
     :init (doom-modeline-mode 1))
 #+END_SRC
 
-** Global modes
+** Global modes and config
 I like these modes.
 
 #+NAME: global-modes
 #+BEGIN_SRC emacs-lisp 
+  (defalias 'yes-or-no-p 'y-or-n-p)
+
   (global-visual-line-mode t) ;; Wraps lines everywhere
   (line-number-mode t) ;; Line numbers in the gutter
   (show-paren-mode t) ;; Highlights parans for me
@@ -355,6 +357,7 @@ Replaces the standard org-mode header asterisks with dots.
       :bind
         (("C-c r b" . org-roam-buffer-toggle)
          ("C-c r t" . org-roam-dailies-goto-today)
+         ("C-c r y" . org-roam-dailies-goto-yesterday)
          ("C-c r f" . org-roam-node-find)
          ("C-c r i" . org-roam-node-insert)
          :map org-mode-map
@@ -368,10 +371,80 @@ Replaces the standard org-mode header asterisks with dots.
     '(("d" "default" entry
        "* %?"
        :if-new (file+head "%<%Y-%m-%d>.org"
-                          "#+title: %<%Y-%m-%d>\n"))))
+                          "#+TITLE: %<%Y-%m-%d>\n#+CREATED: %U\n#+LAST_MODIFIED: %U\n\n* Log\n")))
+      ("t" "Task" entry
+       #'org-roam-capture--get-point
+       "* TODO %?\n  %U\n  %a\n  %i"
+       :file-name "daily/%<%Y-%m-%d>"
+       :olp ("Tasks")
+       :empty-lines 1
+       :head "#+title: %<%Y-%m-%d %a>\n\n[[roam:%<%Y-%B>]]\n\n"))
 #+END_SRC
 
-*** Text helpers
+*** Extending Roam
+Here we add additional function to org-roam to either do something specific for more workflow, or otherwise make ~org-roam~ more full featured.
+
+**** Set CREATED and LAST_MODIFIED tags on save
+I use the PROPERTIES drawer in my org-roam files to denote a few simple fields, such as as the node type. It would also be helpful to have some reliable timestamps. This code does that.
+
+I pulled these functions from [[https://org-roam.discourse.group/t/update-a-field-last-modified-at-save/321/2s][this discourse link]] if you're so inclined to dig further. They run as a ~:hook:~ before save in ~org-mode~.
+
+#+NAME::org-roam-set-timestamps-on-save
+#+BEGIN_SRC emacs-lisp
+  (defvar dl/org-created-property-name "CREATED")
+
+  (defun dl/org-set-created-property (&optional active name)
+    (interactive)
+    (let* ((created (or name dl/org-created-property-name))
+           (fmt (if active "<%s>" "[%s]"))
+           (now (format fmt (format-time-string "%Y-%m-%d %a %H:%M"))))
+      (unless (org-entry-get (point) created nil)
+        (org-set-property created now)
+        now)))
+
+  (defun dl/org-find-time-file-property (property &optional anywhere)
+    (save-excursion
+      (goto-char (point-min))
+      (let ((first-heading
+             (save-excursion
+               (re-search-forward org-outline-regexp-bol nil t))))
+        (when (re-search-forward (format "^#\\+%s:" property)
+                                 (if anywhere nil first-heading) t)
+          (point)))))
+
+  (defun dl/org-has-time-file-property-p (property &optional anywhere)
+    (when-let ((pos (dl/org-find-time-file-property property anywhere)))
+      (save-excursion
+        (goto-char pos)
+        (if (and (looking-at-p " ")
+                 (progn (forward-char)
+                        (org-at-timestamp-p 'lax)))
+            pos -1))))
+
+  (defun dl/org-set-time-file-property (property &optional anywhere pos)
+    (when-let ((pos (or pos
+                        (dl/org-find-time-file-property property))))
+      (save-excursion
+        (goto-char pos)
+        (if (looking-at-p " ")
+            (forward-char)
+          (insert " "))
+        (delete-region (point) (line-end-position))
+        (let* ((now (format-time-string "[%Y-%m-%d %a %H:%M]")))
+          (insert now)))))
+
+  (defun dl/org-set-last-modified ()
+    "Update the LAST_MODIFIED file property in the preamble."
+    (when (derived-mode-p 'org-mode)
+      (dl/org-set-time-file-property "LAST_MODIFIED")))  
+#+END_SRC
+
+#+RESULTS: :org-roam-set-timestamps-on-save
+: dl/org-set-last-modified
+
+**** Quick log entry header
+I map a leader key to let me quickly enter a log entry in my daily note. I prefer a just typing into a simple buffer with timestamp headers over more granular templates.
+
 #+NAME::insert-timestamps
 #+BEGIN_SRC emacs-lisp
 
@@ -392,6 +465,7 @@ Note the weekly scope of the command's precision.")
 
 #+END_SRC
 
+
 ** Evil mode (Vim)
 *** Install package
 This is what makes emacs possible for me. All evil mode packages and related configuration.
@@ -399,55 +473,57 @@ This is what makes emacs possible for me. All evil mode packages and related con
 #+NAME: evil-packages
 #+BEGIN_SRC emacs-lisp 
 
-  (defun dl/evil-hook ()
-    (dolist (mode '(eshell-mode
-                    git-rebase-mode
-                    term-mode))
-    (add-to-list 'evil-emacs-state-modes mode))) ;; no evil mode for these modes
+    (defun dl/evil-hook ()
+      (dolist (mode '(eshell-mode
+                      git-rebase-mode
+                      term-mode))
+      (add-to-list 'evil-emacs-state-modes mode))) ;; no evil mode for these modes
 
-  (use-package evil
-    :init
-    (setq evil-want-integration t) ;; TODO: research what this does
-    (setq evil-want-keybinding nil)
-    (setq evil-want-fine-undo 'fine) ;; undo/redo each motion 
-    (setq evil-want-Y-yank-to-eol t) ;; Y copies to end of line like vim
-    (setq evil-want-C-u-scroll t) ;; vim like scroll up
-    :hook (evil-mode . dl/evil-hook)
-    :config
-    (evil-mode 1)
+    (use-package evil
+      :init
+      (setq evil-want-integration t) ;; TODO: research what this does
+      (setq evil-want-keybinding nil)
+      (setq evil-want-fine-undo 'fine) ;; undo/redo each motion 
+      (setq evil-want-Y-yank-to-eol t) ;; Y copies to end of line like vim
+      (setq evil-want-C-u-scroll t) ;; vim like scroll up
+      :hook (evil-mode . dl/evil-hook)
+      :config
+      (evil-mode 1)
 
-    ;; Emacs "cancel" == vim "cancel"
-    (define-key evil-insert-state-map (kbd "C-g") 'evil-normal-state)
-    ;; Ctrl-h deletes in vim insert mode
-    (define-key evil-insert-state-map (kbd "C-h") 'evil-delete-backward-char-and-join)
-    ;; When we wrap lines, jump visually, not to the "actual" next line
-    (evil-global-set-key 'motion "j" 'evil-next-visual-line)
-    (evil-global-set-key 'motion "k" 'evil-previous-visual-line)
+      ;; Emacs "cancel" == vim "cancel"
+      (define-key evil-insert-state-map (kbd "C-g") 'evil-normal-state)
+      ;; Ctrl-h deletes in vim insert mode
+      (define-key evil-insert-state-map (kbd "C-h") 'evil-delete-backward-char-and-join)
+      ;; When we wrap lines, jump visually, not to the "actual" next line
+      (evil-global-set-key 'motion "j" 'evil-next-visual-line)
+      (evil-global-set-key 'motion "k" 'evil-previous-visual-line)
 
-    (evil-set-initial-state 'message-buffer-mode 'normal)
-    (evil-set-initial-state 'dashboard-mode 'normal))
+      (evil-set-initial-state 'message-buffer-mode 'normal)
+      (evil-set-initial-state 'dashboard-mode 'normal))
 
-  ;; Gives me vim bindings elsewhere in emacs
-  (use-package evil-collection
-    :after evil
-    :config
-    (evil-collection-init))
+    ;; Gives me vim bindings elsewhere in emacs
+    (use-package evil-collection
+      :after evil
+      :config
+      (evil-collection-init))
 
-  ;; Keybindings in org mode
-  (use-package evil-org
-    :after org
-    :hook (org-mode . (lambda () evil-org-mode))
-    :config
-    (require 'evil-org-agenda)
-    (evil-org-agenda-set-keys))
+    ;; Keybindings in org mode
+    (use-package evil-org
+      :after org
+      :hook
+        (org-mode . (lambda () evil-org-mode))
+        (before-save . dl/org-set-last-modified)
+      :config
+      (require 'evil-org-agenda)
+      (evil-org-agenda-set-keys))
 
-  ;; Branching undo system
-  (use-package undo-tree
-    :after evil
-    :diminish 
-    :config
-    (evil-set-undo-system 'undo-tree)
-    (global-undo-tree-mode 1))
+    ;; Branching undo system
+    (use-package undo-tree
+      :after evil
+      :diminish 
+      :config
+      (evil-set-undo-system 'undo-tree)
+      (global-undo-tree-mode 1))
 
 #+END_SRC
 
@@ -570,6 +646,44 @@ File finder and associated helpers that uses the minibuffer (the info window at 
       ("\\.md\\'" . markdown-mode)
       ("\\.markdown\\'" . markdown-mode))
     :init (setq markdown-command "multimarkdown"))
+#+END_SRC
+
+** Emacs Relay Chat (ERC)
+#+BEGIN_SRC emacs-lisp 
+(use-package erc-hl-nicks
+  :after erc)
+
+(use-package erc-image
+  :after erc)
+
+(use-package erc
+  :commands erc
+  :config
+  (setq
+      erc-nick "dlyons"
+      erc-user-full-name "Dustin Lyons"
+      erc-prompt-for-password nil
+      erc-auto-query 'bury
+      erc-join-buffer 'bury
+      erc-track-shorten-start 8
+      erc-interpret-mirc-color t
+      erc-rename-buffers t
+      erc-kill-buffer-on-part t
+      erc-track-exclude-types '("JOIN" "NICK" "PART" "QUIT" "MODE" "AWAY")
+      erc-track-enable-keybindings nil
+      erc-track-visibility nil ; Only use the selected frame for visibility
+      erc-track-exclude-server-buffer t
+      erc-fill-column 120
+      erc-fill-function 'erc-fill-static
+      erc-fill-static-center 20
+      erc-image-inline-rescale 400
+      erc-server-reconnect-timeout 5
+      erc-server-reconnect-attempts 3
+      erc-autojoin-channels-alist '(("irc.libera.chat" "#systemcrafters" "#emacs" "#guix"))
+      erc-modules
+      '(autoaway autojoin button completion fill irccontrols keep-place
+          list match menu move-to-prompt netsplit networks noncommands
+          readonly ring stamp track image hl-nicks notify notifications)))
 #+END_SRC
 
 ** Learning emacs
