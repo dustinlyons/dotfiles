@@ -48,7 +48,7 @@
 (use-package hydra)
 
 (use-package doom-themes
-  :init (load-theme 'doom-rouge t))
+  :init (load-theme 'doom-nord t))
 
 (setq use-dialog-box nil
     use-file-dialog nil
@@ -128,11 +128,11 @@
 (use-package ace-window
   :bind (("M-o" . ace-window))
   :custom
-  (aw-scope 'frame)
-  (aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l))
-  (aw-minibuffer-flag t)
+    (aw-scope 'frame)
+    (aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l))
+    (aw-minibuffer-flag t)
   :config
-  (ace-window-display-mode 1))
+    (ace-window-display-mode 1))
 
 ;; Run M-x all-the-icons-install-fonts to install
 (use-package all-the-icons)
@@ -202,33 +202,42 @@
                 (org-level-8 . 1.0)))
   (set-face-attribute (car face) nil :font "SF Pro Display" :weight 'medium :height (cdr face)))
 
-;; TODO: Turn this into perspective.el thing, instead of bootup
-(defun dl/org-roam-setup ()
-  ;; Turn emacs into Roam at bootup for now
-  (org-roam-mode)
-  (org-roam-dailies-goto-today)
-  (org-roam-dailies-goto-today)
-  (org-roam-buffer-toggle))
-
-  (use-package org-roam
+(use-package org-roam
     :init
       (setq org-roam-v2-ack t) ;; Turn off v2 warning
-    :hook (after-init . dl/org-roam-setup)
+      (org-roam-setup)
     :custom
-      (org-roam-directory "~/Projects/Writing/Roam/")
+      (org-roam-directory (file-truename "~/Projects/Writing/Roam/"))
       (org-roam-dailies-directory "daily/")
-    :bind (:map org-roam-mode-map
-                (("C-c r l" . org-roam)
-                 ("C-c r f" . org-roam-find-file)
-                 ("C-c r g" . org-roam-graph))
-                :map org-mode-map
-                (("C-c r i" . org-roam-node-insert))))
+      (org-roam-completion-everywhere t)
+    :bind
+      (("C-c r b" . org-roam-buffer-toggle)
+       ("C-c r t" . org-roam-dailies-goto-today)
+       ("C-c r f" . org-roam-node-find)
+       ("C-c r i" . org-roam-node-insert)
+       :map org-mode-map
+       ("C-M-i"   . completion-at-point)))
 
 (setq org-roam-dailies-capture-templates
   '(("d" "default" entry
      "* %?"
      :if-new (file+head "%<%Y-%m-%d>.org"
                         "#+title: %<%Y-%m-%d>\n"))))
+
+(defvar current-time-format "%H:%M:%S"
+  "Format of date to insert with `insert-current-time' func.
+Note the weekly scope of the command's precision.")
+
+(defun insert-current-time ()
+  "insert the current time (1-week scope) into the current buffer."
+       (interactive)
+       (insert "* ")
+       (insert (format-time-string current-time-format (current-time)))
+       (insert "\n")
+       )
+
+ (dl/leader-keys
+  ","  '(insert-current-time :which-key "current time"))
 
 (defun dl/evil-hook ()
   (dolist (mode '(eshell-mode
@@ -304,6 +313,15 @@
   :config (counsel-projectile-mode))
 )
 
+(setq backup-directory-alist
+  `(("." . ,(concat user-emacs-directory "backup")))
+    backup-by-copying t    ; Don't delink hardlinks
+    version-control t      ; Use version numbers on backups
+    delete-old-versions t  ; Automatically delete excess backups
+    kept-new-versions 20   ; how many of the newest versions to keep
+    kept-old-versions 5    ; and how many of the old
+  )
+
 (use-package ivy
   :diminish
   :bind (("C-s" . swiper)
@@ -356,14 +374,6 @@
     ("\\.md\\'" . markdown-mode)
     ("\\.markdown\\'" . markdown-mode))
   :init (setq markdown-command "multimarkdown"))
-
-(setq backup-directory-alist '(("." . "~/.emacs.d/backup"))
-  backup-by-copying t    ; Don't delink hardlinks
-  version-control t      ; Use version numbers on backups
-  delete-old-versions t  ; Automatically delete excess backups
-  kept-new-versions 20   ; how many of the newest versions to keep
-  kept-old-versions 5    ; and how many of the old
-  )
 
 (setq org-src-tab-acts-natively t)
 
