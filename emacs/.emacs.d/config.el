@@ -202,19 +202,27 @@
                 (org-level-8 . 1.0)))
   (set-face-attribute (car face) nil :font "SF Pro Display" :weight 'medium :height (cdr face)))
 
-(use-package org-roam
-  :init
-    (setq org-roam-v2-ack t) ;; Turn off v2 warning
-  :hook (after-init . org-roam-mode)
-  :custom
-    (org-roam-directory "~/Projects/Writing/Roam/")
-    (org-roam-dailies-directory "daily/")
-  :bind (:map org-roam-mode-map
-              (("C-c r l" . org-roam)
-               ("C-c r f" . org-roam-find-file)
-               ("C-c r g" . org-roam-graph))
-              :map org-mode-map
-              (("C-c r i" . org-roam-node-insert))))
+;; TODO: Turn this into perspective.el thing, instead of bootup
+(defun dl/org-roam-setup ()
+  ;; Turn emacs into Roam at bootup for now
+  (org-roam-mode)
+  (org-roam-dailies-goto-today)
+  (org-roam-dailies-goto-today)
+  (org-roam-buffer-toggle))
+
+  (use-package org-roam
+    :init
+      (setq org-roam-v2-ack t) ;; Turn off v2 warning
+    :hook (after-init . dl/org-roam-setup)
+    :custom
+      (org-roam-directory "~/Projects/Writing/Roam/")
+      (org-roam-dailies-directory "daily/")
+    :bind (:map org-roam-mode-map
+                (("C-c r l" . org-roam)
+                 ("C-c r f" . org-roam-find-file)
+                 ("C-c r g" . org-roam-graph))
+                :map org-mode-map
+                (("C-c r i" . org-roam-node-insert))))
 
 (setq org-roam-dailies-capture-templates
   '(("d" "default" entry

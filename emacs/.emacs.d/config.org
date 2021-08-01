@@ -344,19 +344,26 @@ Replaces the standard org-mode header asterisks with dots.
 *** Install package
 #+NAME::org-roam-package
 #+BEGIN_SRC emacs-lisp
-  (use-package org-roam
-    :init
-      (setq org-roam-v2-ack t) ;; Turn off v2 warning
-    :hook (after-init . org-roam-mode)
-    :custom
-      (org-roam-directory "~/Projects/Writing/Roam/")
-      (org-roam-dailies-directory "daily/")
-    :bind (:map org-roam-mode-map
-                (("C-c r l" . org-roam)
-                 ("C-c r f" . org-roam-find-file)
-                 ("C-c r g" . org-roam-graph))
-                :map org-mode-map
-                (("C-c r i" . org-roam-node-insert))))
+
+  ;; TODO: Turn this into perspective.el thing, instead of bootup
+  (defun dl/org-roam-setup ()
+    ;; Turn emacs into Roam at bootup for now
+    (org-roam-dailies-goto-today)
+    (org-roam-buffer-toggle))
+
+    (use-package org-roam
+      :init
+        (setq org-roam-v2-ack t) ;; Turn off v2 warning
+      :hook (after-init . dl/org-roam-setup)
+      :custom
+        (org-roam-directory "~/Projects/Writing/Roam/")
+        (org-roam-dailies-directory "daily/")
+      :bind (:map org-roam-mode-map
+                  (("C-c r l" . org-roam)
+                   ("C-c r f" . org-roam-find-file)
+                   ("C-c r g" . org-roam-graph))
+                  :map org-mode-map
+                  (("C-c r i" . org-roam-node-insert))))
 #+END_SRC
 
 *** Configure templates
@@ -464,6 +471,23 @@ Projectile enables me organize projects with a killer grep interface.
 #+END_SRC
 
 ** Managing files
+Configuration related to filesystem, either basic IO and interaction from emacs or directly moving files around where it makes sense.
+
+*** Backups and auto-save
+These settings keep emacs from littering the filesystem with buffer backups. These files look like ~~yourfilename.txt~ or ~#yourfilename.txt#~ and would otherwise be dropped in your working directory.
+
+#+NAME: backup-files
+#+BEGIN_SRC emacs-lisp 
+  (setq backup-directory-alist
+      `(("." . ,(concat user-emacs-directory "backup")))
+    backup-by-copying t    ; Don't delink hardlinks
+    version-control t      ; Use version numbers on backups
+    delete-old-versions t  ; Automatically delete excess backups
+    kept-new-versions 20   ; how many of the newest versions to keep
+    kept-old-versions 5    ; and how many of the old
+    )
+#+END_SRC
+
 *** Fuzzy file finder
 File finder and associated helpers that uses the minibuffer (the info window at the bottom).
 
@@ -530,18 +554,6 @@ File finder and associated helpers that uses the minibuffer (the info window at 
       ("\\.md\\'" . markdown-mode)
       ("\\.markdown\\'" . markdown-mode))
     :init (setq markdown-command "multimarkdown"))
-#+END_SRC
-
-** Auto-save and backup
-#+NAME: auto-save
-#+BEGIN_SRC emacs-lisp 
-  (setq backup-directory-alist '(("." . "~/.emacs.d/backup"))
-    backup-by-copying t    ; Don't delink hardlinks
-    version-control t      ; Use version numbers on backups
-    delete-old-versions t  ; Automatically delete excess backups
-    kept-new-versions 20   ; how many of the newest versions to keep
-    kept-old-versions 5    ; and how many of the old
-    )
 #+END_SRC
 
 ** Learning emacs
