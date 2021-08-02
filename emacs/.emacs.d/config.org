@@ -279,26 +279,27 @@ If you haven't heard of org mode, go watch [[https://www.youtube.com/watch?v=SzA
 
   (use-package org
     :defer t
-    :hook (org-mode . dl/org-mode-setup)
+    :hook
+      (org-mode . dl/org-mode-setup)
+      ;;(before-save . dl/org-set-last-modified)
     :config
     ;; Indent code blocks by 2
     (setq org-edit-src-content-indentation 2
           ;; Prettify the fold indicator
           org-ellipsis " ▾"
           ;; Agenda
-          org-agenda-files
-            '("~/Projects/Writing/OrgFiles/Tasks.org")
+          org-agenda-files '("~/Projects/Writing/OrgFiles/Tasks.org")
           ;; Hide special characters
           org-hide-emphasis-markers t
           ;; Don't start org mode with blocks folded
           org-hide-block-startup nil))
-
 #+END_SRC
 
 *** UI improvements
 Anything related to making org mode pretty.
 
 **** Change default bullets to be pretty
+
 Replaces the standard org-mode header asterisks with dots.
 #+NAME::org-mode-visuals
 #+BEGIN_SRC emacs-lisp
@@ -308,10 +309,6 @@ Replaces the standard org-mode header asterisks with dots.
     :custom
       (org-superstar-remove-leading-stars t)
       (org-superstar-headline-bullets-list '("◉" "○" "●" "○" "▷" "▷" "▷")))
-
-  (font-lock-add-keywords 'org-mode
-                          '(("^ *\\([-]\\) "
-                             (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))))
 #+END_SRC
 
 **** Fonts
@@ -365,24 +362,9 @@ Replaces the standard org-mode header asterisks with dots.
 #+END_SRC
 
 *** Configure templates
-#+NAME::org-roam-templates
-#+BEGIN_SRC emacs-lisp
-  (setq org-roam-dailies-capture-templates
-    '(("d" "default" entry
-       "* %?"
-       :if-new (file+head "%<%Y-%m-%d>.org"
-                          "#+TITLE: %<%Y-%m-%d>\n#+CREATED: %U\n#+LAST_MODIFIED: %U\n\n* Log\n")))
-      ("t" "Task" entry
-       #'org-roam-capture--get-point
-       "* TODO %?\n  %U\n  %a\n  %i"
-       :file-name "daily/%<%Y-%m-%d>"
-       :olp ("Tasks")
-       :empty-lines 1
-       :head "#+title: %<%Y-%m-%d %a>\n\n[[roam:%<%Y-%B>]]\n\n"))
-#+END_SRC
 
 *** Extending Roam
-Here we add additional function to org-roam to either do something specific for more workflow, or otherwise make ~org-roam~ more full featured.
+- Here we add additional function to org-roam to either do something specific for more workflow, or otherwise make ~org-roam~ more full featured.
 
 **** Set CREATED and LAST_MODIFIED tags on save
 I use the PROPERTIES drawer in my org-roam files to denote a few simple fields, such as as the node type. It would also be helpful to have some reliable timestamps. This code does that.
@@ -439,9 +421,6 @@ I pulled these functions from [[https://org-roam.discourse.group/t/update-a-fiel
       (dl/org-set-time-file-property "LAST_MODIFIED")))  
 #+END_SRC
 
-#+RESULTS: :org-roam-set-timestamps-on-save
-: dl/org-set-last-modified
-
 **** Quick log entry header
 I map a leader key to let me quickly enter a log entry in my daily note. I prefer a just typing into a simple buffer with timestamp headers over more granular templates.
 
@@ -455,7 +434,7 @@ Note the weekly scope of the command's precision.")
 (defun insert-current-time ()
   "insert the current time (1-week scope) into the current buffer."
        (interactive)
-       (insert "* ")
+       (insert "** ")
        (insert (format-time-string current-time-format (current-time)))
        (insert "\n")
        )
@@ -464,7 +443,6 @@ Note the weekly scope of the command's precision.")
   ","  '(insert-current-time :which-key "current time"))
 
 #+END_SRC
-
 
 ** Evil mode (Vim)
 *** Install package
@@ -512,7 +490,6 @@ This is what makes emacs possible for me. All evil mode packages and related con
       :after org
       :hook
         (org-mode . (lambda () evil-org-mode))
-        (before-save . dl/org-set-last-modified)
       :config
       (require 'evil-org-agenda)
       (evil-org-agenda-set-keys))

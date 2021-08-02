@@ -140,6 +140,8 @@
   :ensure t
   :init (doom-modeline-mode 1))
 
+(defalias 'yes-or-no-p 'y-or-n-p)
+
 (global-visual-line-mode t) ;; Wraps lines everywhere
 (line-number-mode t) ;; Line numbers in the gutter
 (show-paren-mode t) ;; Highlights parans for me
@@ -153,15 +155,16 @@
 
 (use-package org
   :defer t
-  :hook (org-mode . dl/org-mode-setup)
+  :hook
+    (org-mode . dl/org-mode-setup)
+    ;;(before-save . dl/org-set-last-modified)
   :config
   ;; Indent code blocks by 2
   (setq org-edit-src-content-indentation 2
         ;; Prettify the fold indicator
         org-ellipsis " ▾"
         ;; Agenda
-        org-agenda-files
-          '("~/Projects/Writing/OrgFiles/Tasks.org")
+        org-agenda-files '("~/Projects/Writing/OrgFiles/Tasks.org")
         ;; Hide special characters
         org-hide-emphasis-markers t
         ;; Don't start org mode with blocks folded
@@ -173,10 +176,6 @@
   :custom
     (org-superstar-remove-leading-stars t)
     (org-superstar-headline-bullets-list '("◉" "○" "●" "○" "▷" "▷" "▷")))
-
-(font-lock-add-keywords 'org-mode
-                        '(("^ *\\([-]\\) "
-                           (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))))
 
 ;; Not sure why this is needed, but the org-indent face "requires" it (pun)
 (require 'org-indent)
@@ -213,16 +212,58 @@
     :bind
       (("C-c r b" . org-roam-buffer-toggle)
        ("C-c r t" . org-roam-dailies-goto-today)
+       ("C-c r y" . org-roam-dailies-goto-yesterday)
        ("C-c r f" . org-roam-node-find)
        ("C-c r i" . org-roam-node-insert)
        :map org-mode-map
        ("C-M-i"   . completion-at-point)))
 
-(setq org-roam-dailies-capture-templates
-  '(("d" "default" entry
-     "* %?"
-     :if-new (file+head "%<%Y-%m-%d>.org"
-                        "#+title: %<%Y-%m-%d>\n"))))
+(defvar dl/org-created-property-name "CREATED")
+
+(defun dl/org-set-created-property (&optional active name)
+  (interactive)
+  (let* ((created (or name dl/org-created-property-name))
+         (fmt (if active "<%s>" "[%s]"))
+         (now (format fmt (format-time-string "%Y-%m-%d %a %H:%M"))))
+    (unless (org-entry-get (point) created nil)
+      (org-set-property created now)
+      now)))
+
+(defun dl/org-find-time-file-property (property &optional anywhere)
+  (save-excursion
+    (goto-char (point-min))
+    (let ((first-heading
+           (save-excursion
+             (re-search-forward org-outline-regexp-bol nil t))))
+      (when (re-search-forward (format "^#\\+%s:" property)
+                               (if anywhere nil first-heading) t)
+        (point)))))
+
+(defun dl/org-has-time-file-property-p (property &optional anywhere)
+  (when-let ((pos (dl/org-find-time-file-property property anywhere)))
+    (save-excursion
+      (goto-char pos)
+      (if (and (looking-at-p " ")
+               (progn (forward-char)
+                      (org-at-timestamp-p 'lax)))
+          pos -1))))
+
+(defun dl/org-set-time-file-property (property &optional anywhere pos)
+  (when-let ((pos (or pos
+                      (dl/org-find-time-file-property property))))
+    (save-excursion
+      (goto-char pos)
+      (if (looking-at-p " ")
+          (forward-char)
+        (insert " "))
+      (delete-region (point) (line-end-position))
+      (let* ((now (format-time-string "[%Y-%m-%d %a %H:%M]")))
+        (insert now)))))
+
+(defun dl/org-set-last-modified ()
+  "Update the LAST_MODIFIED file property in the preamble."
+  (when (derived-mode-p 'org-mode)
+    (dl/org-set-time-file-property "LAST_MODIFIED")))
 
 (defvar current-time-format "%H:%M:%S"
   "Format of date to insert with `insert-current-time' func.
@@ -231,7 +272,7 @@ Note the weekly scope of the command's precision.")
 (defun insert-current-time ()
   "insert the current time (1-week scope) into the current buffer."
        (interactive)
-       (insert "* ")
+       (insert "** ")
        (insert (format-time-string current-time-format (current-time)))
        (insert "\n")
        )
@@ -276,7 +317,8 @@ Note the weekly scope of the command's precision.")
 ;; Keybindings in org mode
 (use-package evil-org
   :after org
-  :hook (org-mode . (lambda () evil-org-mode))
+  :hook
+    (org-mode . (lambda () evil-org-mode))
   :config
   (require 'evil-org-agenda)
   (evil-org-agenda-set-keys))
@@ -374,6 +416,41 @@ Note the weekly scope of the command's precision.")
     ("\\.md\\'" . markdown-mode)
     ("\\.markdown\\'" . markdown-mode))
   :init (setq markdown-command "multimarkdown"))
+
+(use-package erc-hl-nicks
+  :after erc)
+
+(use-package erc-image
+  :after erc)
+
+(use-package erc
+  :commands erc
+  :config
+  (setq
+      erc-nick "dlyons"
+      erc-user-full-name "Dustin Lyons"
+      erc-prompt-for-password nil
+      erc-auto-query 'bury
+      erc-join-buffer 'bury
+      erc-track-shorten-start 8
+      erc-interpret-mirc-color t
+      erc-rename-buffers t
+      erc-kill-buffer-on-part t
+      erc-track-exclude-types '("JOIN" "NICK" "PART" "QUIT" "MODE" "AWAY")
+      erc-track-enable-keybindings nil
+      erc-track-visibility nil ; Only use the selected frame for visibility
+      erc-track-exclude-server-buffer t
+      erc-fill-column 120
+      erc-fill-function 'erc-fill-static
+      erc-fill-static-center 20
+      erc-image-inline-rescale 400
+      erc-server-reconnect-timeout 5
+      erc-server-reconnect-attempts 3
+      erc-autojoin-channels-alist '(("irc.libera.chat" "#systemcrafters" "#emacs" "#guix"))
+      erc-modules
+      '(autoaway autojoin button completion fill irccontrols keep-place
+          list match menu move-to-prompt netsplit networks noncommands
+          readonly ring stamp track image hl-nicks notify notifications)))
 
 (setq org-src-tab-acts-natively t)
 
