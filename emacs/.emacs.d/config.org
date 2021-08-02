@@ -356,7 +356,7 @@ Replaces the standard org-mode header asterisks with dots.
          ("C-c r t" . org-roam-dailies-goto-today)
          ("C-c r y" . org-roam-dailies-goto-yesterday)
          ("C-c r f" . org-roam-node-find)
-         ("C-c r i" . org-roam-node-insert)
+         ("C-M-n" . org-roam-node-insert)
          :map org-mode-map
          ("C-M-i"   . completion-at-point)))
 #+END_SRC
