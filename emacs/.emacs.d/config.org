@@ -258,7 +258,7 @@ I like these modes.
 
 #+NAME: global-modes
 #+BEGIN_SRC emacs-lisp 
-  (defalias 'yes-or-no-p 'y-or-n-p)
+  (defalias 'yes-or-no-p 'y-or-n-p) ;; Use Y or N in prompts, instead of full Yes or No
 
   (global-visual-line-mode t) ;; Wraps lines everywhere
   (line-number-mode t) ;; Line numbers in the gutter
@@ -280,18 +280,14 @@ If you haven't heard of org mode, go watch [[https://www.youtube.com/watch?v=SzA
 
   (use-package org
      :defer t
-     :hook
-       (org-mode . dl/org-mode-setup)
+     :hook (org-mode . dl/org-mode-setup)
      :config
-     ;; Indent code blocks by 2
-     (setq org-edit-src-content-indentation 2
-           ;; Prettify the fold indicator
-           org-ellipsis " ▾"
-           ;; Hide special characters
-           org-hide-emphasis-markers t
-           ;; Don't start org mode with blocks folded
-           org-hide-block-startup nil))
-
+       (setq org-edit-src-content-indentation 2 ;; Indent code blocks by 2
+             org-ellipsis " ▾" ;; Prettify the fold indicator
+             org-hide-emphasis-markers t ;; Hide special characters
+             org-hide-block-startup nil) ;; Don't start org mode with blocks folded
+     :bind
+        (("C-c a" . org-agenda)))
 #+END_SRC
 
 *** Roam
@@ -396,7 +392,8 @@ Note the weekly scope of the command's precision.")
 
 #+END_SRC
 
-**** Only look at files with TODOs
+*** Agenda
+**** Only use files with TODOs in org-agenda 
 I use org-roam to take notes, which keeps many small files in the style of Zettelkasten. However, org-agenda doesn't perform well in this scenario. To fix this, we filter out all files from org-agenda that don't contain a ~TODO~. 
 
 #+NAME::org-mode
@@ -462,7 +459,6 @@ Replaces the standard org-mode header asterisks with dots.
                   (org-level-8 . 1.0)))
     (set-face-attribute (car face) nil :font "SF Pro Display" :weight 'medium :height (cdr face)))
 #+END_SRC
-
 
 ** Evil mode (Vim)
 *** Install package
