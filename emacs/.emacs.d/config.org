@@ -2,6 +2,7 @@
 #+CONSTANTS: code_dir_path="~/Projects/Code"
 
 * Configuration   :emacs:
+
 ** About this file
 This is my emacs config file. Yes, in emacs you can write configuration like a Google Doc and get away with it. It's called [[https://en.wikipedia.org/wiki/Literate_programming]["literate programming"]].
 
@@ -278,69 +279,23 @@ If you haven't heard of org mode, go watch [[https://www.youtube.com/watch?v=SzA
     (setq evil-auto-indent nil))
 
   (use-package org
-    :defer t
-    :hook
-      (org-mode . dl/org-mode-setup)
-      ;;(before-save . dl/org-set-last-modified)
-    :config
-    ;; Indent code blocks by 2
-    (setq org-edit-src-content-indentation 2
-          ;; Prettify the fold indicator
-          org-ellipsis " ▾"
-          ;; Agenda
-          org-agenda-files '("~/Projects/Writing/OrgFiles/Tasks.org")
-          ;; Hide special characters
-          org-hide-emphasis-markers t
-          ;; Don't start org mode with blocks folded
-          org-hide-block-startup nil))
+     :defer t
+     :hook
+       (org-mode . dl/org-mode-setup)
+     :config
+     ;; Indent code blocks by 2
+     (setq org-edit-src-content-indentation 2
+           ;; Prettify the fold indicator
+           org-ellipsis " ▾"
+           ;; Hide special characters
+           org-hide-emphasis-markers t
+           ;; Don't start org mode with blocks folded
+           org-hide-block-startup nil))
+
 #+END_SRC
 
-*** UI improvements
-Anything related to making org mode pretty.
-
-**** Change default bullets to be pretty
-
-Replaces the standard org-mode header asterisks with dots.
-#+NAME::org-mode-visuals
-#+BEGIN_SRC emacs-lisp
-  (use-package org-superstar
-    :after org
-    :hook (org-mode . org-superstar-mode)
-    :custom
-      (org-superstar-remove-leading-stars t)
-      (org-superstar-headline-bullets-list '("◉" "○" "●" "○" "▷" "▷" "▷")))
-#+END_SRC
-
-**** Fonts
-#+NAME::org-mode-variable-width-fonts
-#+BEGIN_SRC emacs-lisp
-  ;; Not sure why this is needed, but the org-indent face "requires" it (pun)
-  (require 'org-indent)
-
-  (set-face-attribute 'org-block nil :foreground nil :inherit 'fixed-pitch)
-  (set-face-attribute 'org-table nil  :inherit 'fixed-pitch)
-  (set-face-attribute 'org-formula nil  :inherit 'fixed-pitch)
-  (set-face-attribute 'org-code nil   :inherit '(shadow fixed-pitch))
-  (set-face-attribute 'org-indent nil :inherit '(org-hide fixed-pitch))
-  (set-face-attribute 'org-verbatim nil :inherit '(shadow fixed-pitch))
-  (set-face-attribute 'org-special-keyword nil :inherit '(font-lock-comment-face fixed-pitch))
-  (set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
-  (set-face-attribute 'org-checkbox nil :inherit 'fixed-pitch)
-
-  (set-face-attribute 'org-document-title nil :font "SF Pro Display" :weight 'bold :height 1.2)
-  (dolist (face '((org-level-1 . 1.2)
-                  (org-level-2 . 1.15)
-                  (org-level-3 . 1.1)
-                  (org-level-4 . 1.05)
-                  (org-level-5 . 1.05)
-                  (org-level-6 . 1.0)
-                  (org-level-7 . 1.0)
-                  (org-level-8 . 1.0)))
-    (set-face-attribute (car face) nil :font "SF Pro Display" :weight 'medium :height (cdr face)))
-#+END_SRC
-
-** Roam
-*** Install package
+*** Roam
+**** Install package
 #+NAME::org-roam-package
 #+BEGIN_SRC emacs-lisp
   (use-package org-roam
@@ -361,15 +316,12 @@ Replaces the standard org-mode header asterisks with dots.
          ("C-M-i"   . completion-at-point)))
 #+END_SRC
 
-*** Configure templates
+**** Configure templates
+**** Extending Roam
+Here we add additional function to org-roam to either do something specific for more workflow, or otherwise make ~org-roam~ more full featured.
 
-*** Extending Roam
-- Here we add additional function to org-roam to either do something specific for more workflow, or otherwise make ~org-roam~ more full featured.
-
-**** Set CREATED and LAST_MODIFIED tags on save
+***** Set CREATED and LAST_MODIFIED tags on save
 I use the PROPERTIES drawer in my org-roam files to denote a few simple fields, such as as the node type. It would also be helpful to have some reliable timestamps. This code does that.
-
-I pulled these functions from [[https://org-roam.discourse.group/t/update-a-field-last-modified-at-save/321/2s][this discourse link]] if you're so inclined to dig further. They run as a ~:hook:~ before save in ~org-mode~.
 
 #+NAME::org-roam-set-timestamps-on-save
 #+BEGIN_SRC emacs-lisp
@@ -421,7 +373,7 @@ I pulled these functions from [[https://org-roam.discourse.group/t/update-a-fiel
       (dl/org-set-time-file-property "LAST_MODIFIED")))  
 #+END_SRC
 
-**** Quick log entry header
+***** Quick log entry header
 I map a leader key to let me quickly enter a log entry in my daily note. I prefer a just typing into a simple buffer with timestamp headers over more granular templates.
 
 #+NAME::insert-timestamps
@@ -434,7 +386,7 @@ Note the weekly scope of the command's precision.")
 (defun insert-current-time ()
   "insert the current time (1-week scope) into the current buffer."
        (interactive)
-       (insert "** ")
+       (insert "* ")
        (insert (format-time-string current-time-format (current-time)))
        (insert "\n")
        )
@@ -443,6 +395,74 @@ Note the weekly scope of the command's precision.")
   ","  '(insert-current-time :which-key "current time"))
 
 #+END_SRC
+
+**** Only look at files with TODOs
+I use org-roam to take notes, which keeps many small files in the style of Zettelkasten. However, org-agenda doesn't perform well in this scenario. To fix this, we filter out all files from org-agenda that don't contain a ~TODO~. 
+
+#+NAME::org-mode
+#+BEGIN_SRC emacs-lisp 
+  (defun dl/define-agenda-files ()
+    "Return a list of note files containing 'has-todo' tag. 
+     I use this to denote files with tasks for org-agenda" ;
+    (seq-uniq
+     (seq-map
+      #'car
+      (org-roam-db-query
+       [:select [nodes:file]
+        :from tags
+        :left-join nodes
+        :on (= tags:node-id nodes:id)
+        :where (like tag (quote "%\"Has-Todo\"%"))]))))
+
+  ;; Roam Daily Log and Project Files only
+   (setq org-agenda-files (dl/define-agenda-files))
+
+#+END_SRC
+
+*** UI improvements
+Anything related to making org mode pretty.
+
+**** Change default bullets to be pretty
+
+Replaces the standard org-mode header asterisks with dots.
+#+NAME::org-mode-visuals
+#+BEGIN_SRC emacs-lisp
+  (use-package org-superstar
+    :after org
+    :hook (org-mode . org-superstar-mode)
+    :custom
+      (org-superstar-remove-leading-stars t)
+      (org-superstar-headline-bullets-list '("◉" "○" "●" "○" "▷" "▷" "▷")))
+#+END_SRC
+
+**** Fonts
+#+NAME::org-mode-variable-width-fonts
+#+BEGIN_SRC emacs-lisp
+  ;; Not sure why this is needed, but the org-indent face "requires" it (pun)
+  (require 'org-indent)
+
+  (set-face-attribute 'org-block nil :foreground nil :inherit 'fixed-pitch)
+  (set-face-attribute 'org-table nil  :inherit 'fixed-pitch)
+  (set-face-attribute 'org-formula nil  :inherit 'fixed-pitch)
+  (set-face-attribute 'org-code nil   :inherit '(shadow fixed-pitch))
+  (set-face-attribute 'org-indent nil :inherit '(org-hide fixed-pitch))
+  (set-face-attribute 'org-verbatim nil :inherit '(shadow fixed-pitch))
+  (set-face-attribute 'org-special-keyword nil :inherit '(font-lock-comment-face fixed-pitch))
+  (set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
+  (set-face-attribute 'org-checkbox nil :inherit 'fixed-pitch)
+
+  (set-face-attribute 'org-document-title nil :font "SF Pro Display" :weight 'bold :height 1.2)
+  (dolist (face '((org-level-1 . 1.2)
+                  (org-level-2 . 1.15)
+                  (org-level-3 . 1.1)
+                  (org-level-4 . 1.05)
+                  (org-level-5 . 1.05)
+                  (org-level-6 . 1.0)
+                  (org-level-7 . 1.0)
+                  (org-level-8 . 1.0)))
+    (set-face-attribute (car face) nil :font "SF Pro Display" :weight 'medium :height (cdr face)))
+#+END_SRC
+
 
 ** Evil mode (Vim)
 *** Install package
@@ -601,15 +621,10 @@ File finder and associated helpers that uses the minibuffer (the info window at 
 #+END_SRC
 
 ** Git
-#+NAME: file-finder
+#+NAME: magit-git
 #+BEGIN_SRC emacs-lisp 
   (use-package magit
     :commands (magit-status magit-get-current-branch))
-    ;;:custom
-    ;;(magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1))
-
-  (use-package evil-magit
-    :after magit)
 #+END_SRC
 
 *** File types

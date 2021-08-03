@@ -147,59 +147,25 @@
 (show-paren-mode t) ;; Highlights parans for me
 
 (defun dl/org-mode-setup ()
-  (org-indent-mode)
-  (variable-pitch-mode 1)
-  (auto-fill-mode 0)
-  (visual-line-mode 1)
-  (setq evil-auto-indent nil))
+    (org-indent-mode)
+    (variable-pitch-mode 1)
+    (auto-fill-mode 0)
+    (visual-line-mode 1)
+    (setq evil-auto-indent nil))
 
 (use-package org
-  :defer t
-  :hook
-    (org-mode . dl/org-mode-setup)
-    ;;(before-save . dl/org-set-last-modified)
-  :config
-  ;; Indent code blocks by 2
-  (setq org-edit-src-content-indentation 2
-        ;; Prettify the fold indicator
-        org-ellipsis " ▾"
-        ;; Agenda
-        org-agenda-files '("~/Projects/Writing/OrgFiles/Tasks.org")
-        ;; Hide special characters
-        org-hide-emphasis-markers t
-        ;; Don't start org mode with blocks folded
-        org-hide-block-startup nil))
-
-(use-package org-superstar
-  :after org
-  :hook (org-mode . org-superstar-mode)
-  :custom
-    (org-superstar-remove-leading-stars t)
-    (org-superstar-headline-bullets-list '("◉" "○" "●" "○" "▷" "▷" "▷")))
-
-;; Not sure why this is needed, but the org-indent face "requires" it (pun)
-(require 'org-indent)
-
-(set-face-attribute 'org-block nil :foreground nil :inherit 'fixed-pitch)
-(set-face-attribute 'org-table nil  :inherit 'fixed-pitch)
-(set-face-attribute 'org-formula nil  :inherit 'fixed-pitch)
-(set-face-attribute 'org-code nil   :inherit '(shadow fixed-pitch))
-(set-face-attribute 'org-indent nil :inherit '(org-hide fixed-pitch))
-(set-face-attribute 'org-verbatim nil :inherit '(shadow fixed-pitch))
-(set-face-attribute 'org-special-keyword nil :inherit '(font-lock-comment-face fixed-pitch))
-(set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
-(set-face-attribute 'org-checkbox nil :inherit 'fixed-pitch)
-
-(set-face-attribute 'org-document-title nil :font "SF Pro Display" :weight 'bold :height 1.2)
-(dolist (face '((org-level-1 . 1.2)
-                (org-level-2 . 1.15)
-                (org-level-3 . 1.1)
-                (org-level-4 . 1.05)
-                (org-level-5 . 1.05)
-                (org-level-6 . 1.0)
-                (org-level-7 . 1.0)
-                (org-level-8 . 1.0)))
-  (set-face-attribute (car face) nil :font "SF Pro Display" :weight 'medium :height (cdr face)))
+   :defer t
+   :hook
+     (org-mode . dl/org-mode-setup)
+   :config
+   ;; Indent code blocks by 2
+   (setq org-edit-src-content-indentation 2
+         ;; Prettify the fold indicator
+         org-ellipsis " ▾"
+         ;; Hide special characters
+         org-hide-emphasis-markers t
+         ;; Don't start org mode with blocks folded
+         org-hide-block-startup nil))
 
 (use-package org-roam
     :init
@@ -214,7 +180,7 @@
        ("C-c r t" . org-roam-dailies-goto-today)
        ("C-c r y" . org-roam-dailies-goto-yesterday)
        ("C-c r f" . org-roam-node-find)
-       ("C-c r i" . org-roam-node-insert)
+       ("C-M-n" . org-roam-node-insert)
        :map org-mode-map
        ("C-M-i"   . completion-at-point)))
 
@@ -272,13 +238,60 @@ Note the weekly scope of the command's precision.")
 (defun insert-current-time ()
   "insert the current time (1-week scope) into the current buffer."
        (interactive)
-       (insert "** ")
+       (insert "* ")
        (insert (format-time-string current-time-format (current-time)))
        (insert "\n")
        )
 
  (dl/leader-keys
   ","  '(insert-current-time :which-key "current time"))
+
+(defun dl/define-agenda-files ()
+  "Return a list of note files containing 'has-todo' tag. 
+   I use this to denote files with tasks for org-agenda" ;
+  (seq-uniq
+   (seq-map
+    #'car
+    (org-roam-db-query
+     [:select [nodes:file]
+      :from tags
+      :left-join nodes
+      :on (= tags:node-id nodes:id)
+      :where (like tag (quote "%\"Has-Todo\"%"))]))))
+
+;; Roam Daily Log and Project Files only
+ (setq org-agenda-files (dl/define-agenda-files))
+
+(use-package org-superstar
+  :after org
+  :hook (org-mode . org-superstar-mode)
+  :custom
+    (org-superstar-remove-leading-stars t)
+    (org-superstar-headline-bullets-list '("◉" "○" "●" "○" "▷" "▷" "▷")))
+
+;; Not sure why this is needed, but the org-indent face "requires" it (pun)
+(require 'org-indent)
+
+(set-face-attribute 'org-block nil :foreground nil :inherit 'fixed-pitch)
+(set-face-attribute 'org-table nil  :inherit 'fixed-pitch)
+(set-face-attribute 'org-formula nil  :inherit 'fixed-pitch)
+(set-face-attribute 'org-code nil   :inherit '(shadow fixed-pitch))
+(set-face-attribute 'org-indent nil :inherit '(org-hide fixed-pitch))
+(set-face-attribute 'org-verbatim nil :inherit '(shadow fixed-pitch))
+(set-face-attribute 'org-special-keyword nil :inherit '(font-lock-comment-face fixed-pitch))
+(set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
+(set-face-attribute 'org-checkbox nil :inherit 'fixed-pitch)
+
+(set-face-attribute 'org-document-title nil :font "SF Pro Display" :weight 'bold :height 1.2)
+(dolist (face '((org-level-1 . 1.2)
+                (org-level-2 . 1.15)
+                (org-level-3 . 1.1)
+                (org-level-4 . 1.05)
+                (org-level-5 . 1.05)
+                (org-level-6 . 1.0)
+                (org-level-7 . 1.0)
+                (org-level-8 . 1.0)))
+  (set-face-attribute (car face) nil :font "SF Pro Display" :weight 'medium :height (cdr face)))
 
 (defun dl/evil-hook ()
   (dolist (mode '(eshell-mode
@@ -403,11 +416,6 @@ Note the weekly scope of the command's precision.")
 
 (use-package magit
   :commands (magit-status magit-get-current-branch))
-  ;;:custom
-  ;;(magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1))
-
-(use-package evil-magit
-  :after magit)
 
 ;; This uses Github Flavored Markdown for README files
 (use-package markdown-mode
