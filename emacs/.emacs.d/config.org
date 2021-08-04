@@ -315,6 +315,23 @@ If you haven't heard of org mode, go watch [[https://www.youtube.com/watch?v=SzA
 #+END_SRC
 
 **** Configure templates
+#+NAME::org-roam-templates
+#+BEGIN_SRC emacs-lisp
+  (setq org-roam-dailies-capture-templates
+    '(("d" "default" entry
+       "* %?"
+       :if-new (file+head "%<%Y-%m-%d>.org"
+                          "#+TITLE: %<%Y-%m-%d>\n#+CREATED: %U\n#+LAST_MODIFIED: %U\n\n* Log\n")))
+      ;; Note for tomorrow -- do we want to organize projects in projects/ dir?
+      ("t" "Task" entry
+       #'org-roam-capture--get-point
+       "* TODO %?\n  %U\n  %a\n  %i"
+       :file-name "daily/%<%Y-%m-%d>"
+       :olp ("Tasks")
+       :empty-lines 1
+       :head "#+title: %<%Y-%m-%d %a>\n\n[[roam:%<%Y-%B>]]\n\n"))
+#+END_SRC
+
 **** Extending Roam
 Here we add additional function to org-roam to either do something specific for more workflow, or otherwise make ~org-roam~ more full featured.
 
