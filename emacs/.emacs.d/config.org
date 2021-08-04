@@ -309,7 +309,9 @@ If you haven't heard of org mode, go watch [[https://www.youtube.com/watch?v=SzA
          ("C-c r f" . org-roam-node-find)
          ("C-M-n" . org-roam-node-insert)
          :map org-mode-map
-         ("C-M-i"   . completion-at-point)))
+         ("C-M-i"   . completion-at-point)
+         ("C-<left>" . org-roam-dailies-goto-previous-note)
+         ("C-<right>" . org-roam-dailies-goto-next)))
 #+END_SRC
 
 **** Configure templates
