@@ -140,32 +140,29 @@
   :ensure t
   :init (doom-modeline-mode 1))
 
-(defalias 'yes-or-no-p 'y-or-n-p)
+(defalias 'yes-or-no-p 'y-or-n-p) ;; Use Y or N in prompts, instead of full Yes or No
 
 (global-visual-line-mode t) ;; Wraps lines everywhere
 (line-number-mode t) ;; Line numbers in the gutter
 (show-paren-mode t) ;; Highlights parans for me
 
 (defun dl/org-mode-setup ()
-    (org-indent-mode)
-    (variable-pitch-mode 1)
-    (auto-fill-mode 0)
-    (visual-line-mode 1)
-    (setq evil-auto-indent nil))
+  (org-indent-mode)
+  (variable-pitch-mode 1)
+  (auto-fill-mode 0)
+  (visual-line-mode 1)
+  (setq evil-auto-indent nil))
 
 (use-package org
    :defer t
-   :hook
-     (org-mode . dl/org-mode-setup)
+   :hook (org-mode . dl/org-mode-setup)
    :config
-   ;; Indent code blocks by 2
-   (setq org-edit-src-content-indentation 2
-         ;; Prettify the fold indicator
-         org-ellipsis " ▾"
-         ;; Hide special characters
-         org-hide-emphasis-markers t
-         ;; Don't start org mode with blocks folded
-         org-hide-block-startup nil))
+     (setq org-edit-src-content-indentation 2 ;; Indent code blocks by 2
+           org-ellipsis " ▾" ;; Prettify the fold indicator
+           org-hide-emphasis-markers t ;; Hide special characters
+           org-hide-block-startup nil) ;; Don't start org mode with blocks folded
+   :bind
+      (("C-c a" . org-agenda)))
 
 (use-package org-roam
     :init
@@ -182,7 +179,15 @@
        ("C-c r f" . org-roam-node-find)
        ("C-M-n" . org-roam-node-insert)
        :map org-mode-map
-       ("C-M-i"   . completion-at-point)))
+       ("C-M-i"   . completion-at-point)
+       ("C-<left>" . org-roam-dailies-goto-previous-note)
+       ("C-<right>" . org-roam-dailies-goto-next)))
+
+(setq org-roam-dailies-capture-templates
+  '(("d" "default" entry
+     "* %?"
+     :if-new (file+head "%<%Y-%m-%d>.org"
+                        "#+TITLE: %<%Y-%m-%d>\n#+CREATED: %U\n#+LAST_MODIFIED: %U\n\n* Log\n"))))
 
 (defvar dl/org-created-property-name "CREATED")
 
@@ -247,7 +252,7 @@ Note the weekly scope of the command's precision.")
   ","  '(insert-current-time :which-key "current time"))
 
 (defun dl/define-agenda-files ()
-  "Return a list of note files containing 'has-todo' tag. 
+  "Return a list of note files containing 'HasTodo' tag. 
    I use this to denote files with tasks for org-agenda" ;
   (seq-uniq
    (seq-map
@@ -257,7 +262,7 @@ Note the weekly scope of the command's precision.")
       :from tags
       :left-join nodes
       :on (= tags:node-id nodes:id)
-      :where (like tag (quote "%\"Has-Todo\"%"))]))))
+      :where (like tag (quote "%\"HasTodo\"%"))]))))
 
 ;; Roam Daily Log and Project Files only
  (setq org-agenda-files (dl/define-agenda-files))

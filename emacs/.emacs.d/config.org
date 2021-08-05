@@ -74,7 +74,7 @@ Straight.el fetchs packages over git via use-package.
 
 ** Keybindings
 *** Leader keys
-I use general.el to define groups of keybindings under my 'leader' definition. [[https://medium.com/usevim/vim-101-what-is-the-leader-key-f2f5c1fa610f][Here]] is a good explanation on leader keys.
+I use general.el to define groups of keybindings under my 'leader' definition. You will see these definitions sprinkled throughout this file; my own private collection of fast shit. For more info, [[https://medium.com/usevim/vim-101-what-is-the-leader-key-f2f5c1fa610f][here]] is a good explanation on leader keys.
 
 #+NAME: keybindings
 #+BEGIN_SRC emacs-lisp 
@@ -253,8 +253,9 @@ Keeps info at my fingertips. Modeline is much better than Vim's Powerline (sorry
     :init (doom-modeline-mode 1))
 #+END_SRC
 
-** Global modes and config
-I like these modes.
+** Global setings and config
+***  Global modes
+I like these modes, what can I say.
 
 #+NAME: global-modes
 #+BEGIN_SRC emacs-lisp 
@@ -321,15 +322,7 @@ If you haven't heard of org mode, go watch [[https://www.youtube.com/watch?v=SzA
     '(("d" "default" entry
        "* %?"
        :if-new (file+head "%<%Y-%m-%d>.org"
-                          "#+TITLE: %<%Y-%m-%d>\n#+CREATED: %U\n#+LAST_MODIFIED: %U\n\n* Log\n")))
-      ;; Note for tomorrow -- do we want to organize projects in projects/ dir?
-      ("t" "Task" entry
-       #'org-roam-capture--get-point
-       "* TODO %?\n  %U\n  %a\n  %i"
-       :file-name "daily/%<%Y-%m-%d>"
-       :olp ("Tasks")
-       :empty-lines 1
-       :head "#+title: %<%Y-%m-%d %a>\n\n[[roam:%<%Y-%B>]]\n\n"))
+                          "#+TITLE: %<%Y-%m-%d>\n#+CREATED: %U\n#+LAST_MODIFIED: %U\n\n* Log\n"))))
 #+END_SRC
 
 **** Extending Roam
@@ -418,7 +411,7 @@ I use org-roam to take notes, which keeps many small files in the style of Zette
 #+NAME::org-mode
 #+BEGIN_SRC emacs-lisp 
   (defun dl/define-agenda-files ()
-    "Return a list of note files containing 'has-todo' tag. 
+    "Return a list of note files containing 'HasTodo' tag. 
      I use this to denote files with tasks for org-agenda" ;
     (seq-uniq
      (seq-map
@@ -428,7 +421,7 @@ I use org-roam to take notes, which keeps many small files in the style of Zette
         :from tags
         :left-join nodes
         :on (= tags:node-id nodes:id)
-        :where (like tag (quote "%\"Has-Todo\"%"))]))))
+        :where (like tag (quote "%\"HasTodo\"%"))]))))
 
   ;; Roam Daily Log and Project Files only
    (setq org-agenda-files (dl/define-agenda-files))
@@ -540,7 +533,7 @@ This is what makes emacs possible for me. All evil mode packages and related con
 #+END_SRC
 
 ** Utility packages
-Various helpers.
+Various helpers and packages I find useful.
 
 *** Google
 #+BEGIN_SRC emacs-lisp
