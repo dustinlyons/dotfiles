@@ -168,6 +168,12 @@
     :init
       (setq org-roam-v2-ack t) ;; Turn off v2 warning
       (org-roam-setup)
+      (add-to-list 'display-buffer-alist
+          '("\\*org-roam\\*"
+            (display-buffer-in-direction)
+            (direction . right)
+            (window-width . 0.33)
+            (window-height . fit-window-to-buffer)))
     :custom
       (org-roam-directory (file-truename "~/Projects/Writing/Roam/"))
       (org-roam-dailies-directory "daily/")
@@ -176,12 +182,12 @@
       (("C-c r b" . org-roam-buffer-toggle)
        ("C-c r t" . org-roam-dailies-goto-today)
        ("C-c r y" . org-roam-dailies-goto-yesterday)
-       ("C-c r f" . org-roam-node-find)
        ("C-M-n" . org-roam-node-insert)
        :map org-mode-map
        ("C-M-i"   . completion-at-point)
+       ("C-M-f" . org-roam-node-find)
        ("C-<left>" . org-roam-dailies-goto-previous-note)
-       ("C-<right>" . org-roam-dailies-goto-next)))
+       ("C-<right>" . org-roam-dailies-goto-next-note)))
 
 (setq org-roam-dailies-capture-templates
   '(("d" "default" entry
