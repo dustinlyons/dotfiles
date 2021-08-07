@@ -272,9 +272,6 @@ If you haven't heard of org mode, go watch [[https://www.youtube.com/watch?v=SzA
 
 #+NAME::org-mode
 #+BEGIN_SRC emacs-lisp 
-  ;; Some weird org clock error, and package-initialize fixes it
-  ;; See Stack Overflow answer 16281359
-  (package-initialize)
   (defun dl/org-mode-setup ()
     (org-indent-mode)
     (variable-pitch-mode 1)

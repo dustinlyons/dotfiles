@@ -146,6 +146,9 @@
 (line-number-mode t) ;; Line numbers in the gutter
 (show-paren-mode t) ;; Highlights parans for me
 
+;; Some weird org clock error, and package-initialize fixes it
+;; See Stack Overflow answer 16281359
+(package-initialize)
 (defun dl/org-mode-setup ()
   (org-indent-mode)
   (variable-pitch-mode 1)
