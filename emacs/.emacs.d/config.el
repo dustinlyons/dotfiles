@@ -300,10 +300,44 @@ Note the weekly scope of the command's precision.")
       :from tags
       :left-join nodes
       :on (= tags:node-id nodes:id)
-      :where (like tag (quote "%\"HasTodo\"%"))]))))
+      :where (like tag (quote "%\"Project\"%"))]))))
+      ;;:where (or (like tag (quote "%\"Daily\"%")) (like tag (quote "%\"Project\"%")))])))
 
 ;; Roam Daily Log and Project Files only
  (setq org-agenda-files (dl/define-agenda-files))
+
+(defun dl/buffer-prop-get (name)
+  "Get a buffer property called NAME as a string."
+  (org-with-point-at 1
+    (when (re-search-forward (concat "^#\\+" name ": \\(.*\\)")
+                             (point-max) t)
+      (buffer-substring-no-properties
+       (match-beginning 1)
+       (match-end 1)))))
+
+(defun dl/agenda-category (&optional len)
+  "Get category of item at point for agenda."
+  (let* ((file-name (when buffer-file-name
+                      (file-name-sans-extension
+                       (file-name-nondirectory buffer-file-name))))
+         (title (dl/buffer-prop-get "title"))
+         (category (org-get-category))
+         (result
+          (or (if (and
+                   title
+                   (string-equal category file-name))
+                  title
+                category)
+              "")))
+    (if (numberp len)
+        (s-truncate len (s-pad-right len " " result))
+      result)))
+
+(setq org-agenda-prefix-format
+      '((agenda . " %i %(dl/agenda-category 12)%?-12t% s")
+        (todo . " %i %(dl/agenda-category 12) ")
+        (tags . " %i %(dl/agenda-category 12) ")
+        (search . " %i %(dl/agenda-category 12) ")))
 
 (use-package org-superstar
   :after org
