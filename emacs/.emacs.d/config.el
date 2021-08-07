@@ -146,26 +146,49 @@
 (line-number-mode t) ;; Line numbers in the gutter
 (show-paren-mode t) ;; Highlights parans for me
 
-;; Some weird org clock error, and package-initialize fixes it
-;; See Stack Overflow answer 16281359
-(package-initialize)
 (defun dl/org-mode-setup ()
-  (org-indent-mode)
-  (variable-pitch-mode 1)
-  (auto-fill-mode 0)
-  (visual-line-mode 1)
-  (setq evil-auto-indent nil))
+   (org-indent-mode)
+   (variable-pitch-mode 1)
+   (auto-fill-mode 0)
+   (visual-line-mode 1)
+   (setq evil-auto-indent nil))
 
-(use-package org
-   :defer t
-   :hook (org-mode . dl/org-mode-setup)
-   :config
-     (setq org-edit-src-content-indentation 2 ;; Indent code blocks by 2
-           org-ellipsis " ▾" ;; Prettify the fold indicator
-           org-hide-emphasis-markers t ;; Hide special characters
-           org-hide-block-startup nil) ;; Don't start org mode with blocks folded
-   :bind
-      (("C-c a" . org-agenda)))
+ (use-package org
+    :defer t
+    :custom
+      '(org-todo-keyword-faces
+      '(("TODO" :foreground "medium blue" :weight bold)
+          ("RECUR" :foreground "cornflowerblue" :weight bold)
+          ("APPT" :foreground "medium blue" :weight bold)
+          ("NOTE" :foreground "brown" :weight bold)
+          ("NEXT" :foreground "dark orange" :weight bold)
+          ("WAITING" :foreground "red" :weight bold)
+          ("CANCELLED" :foreground "dark violet" :weight bold)
+          ("DEFERRED" :foreground "dark blue" :weight bold)
+          ("SOMEDAY" :foreground "dark blue" :weight bold)
+          ("PROJECT" :foreground "#088e8e" :weight bold)))
+    :hook (org-mode . dl/org-mode-setup)
+    :config
+      (setq org-edit-src-content-indentation 2 ;; Indent code blocks by 2
+            org-ellipsis " ▾" ;; Prettify the fold indicator
+            org-hide-emphasis-markers t ;; Hide special characters
+            org-hide-block-startup nil) ;; Don't start org mode with blocks folded
+    :bind
+       (("C-c a" . org-agenda)))
+
+(setq org-todo-keywords
+ '((sequence "TODO"
+     "RECUR"
+     "PROJECT"
+     "APPT"
+     "NOTE"
+     "NEXT"
+     "WAITING"
+     "DEFERRED"
+     "SOMEDAY"
+     "|"
+     "CANCELLED"
+     "DONE")))
 
 (use-package org-roam
     :init
@@ -189,6 +212,7 @@
        :map org-mode-map
        ("C-M-i"   . completion-at-point)
        ("C-M-f" . org-roam-node-find)
+       ("C-M-c" . dl/org-roam-create-id)
        ("C-<left>" . org-roam-dailies-goto-previous-note)
        ("C-<right>" . org-roam-dailies-goto-next-note)))
 
@@ -244,6 +268,11 @@
   "Update the LAST_MODIFIED file property in the preamble."
   (when (derived-mode-p 'org-mode)
     (dl/org-set-time-file-property "LAST_MODIFIED")))
+
+(defun dl/org-roam-create-id ()
+  (interactive)
+  (org-id-get-create)
+  (dl/org-set-created-property))
 
 (defvar current-time-format "%H:%M:%S"
   "Format of date to insert with `insert-current-time' func.

@@ -272,53 +272,80 @@ If you haven't heard of org mode, go watch [[https://www.youtube.com/watch?v=SzA
 
 #+NAME::org-mode
 #+BEGIN_SRC emacs-lisp 
-  (defun dl/org-mode-setup ()
-    (org-indent-mode)
-    (variable-pitch-mode 1)
-    (auto-fill-mode 0)
-    (visual-line-mode 1)
-    (setq evil-auto-indent nil))
+    (defun dl/org-mode-setup ()
+      (org-indent-mode)
+      (variable-pitch-mode 1)
+      (auto-fill-mode 0)
+      (visual-line-mode 1)
+      (setq evil-auto-indent nil))
 
-  (use-package org
-     :defer t
-     :hook (org-mode . dl/org-mode-setup)
-     :config
-       (setq org-edit-src-content-indentation 2 ;; Indent code blocks by 2
-             org-ellipsis " ▾" ;; Prettify the fold indicator
-             org-hide-emphasis-markers t ;; Hide special characters
-             org-hide-block-startup nil) ;; Don't start org mode with blocks folded
-     :bind
-        (("C-c a" . org-agenda)))
+    (use-package org
+       :defer t
+       :custom
+         '(org-todo-keyword-faces
+         '(("TODO" :foreground "medium blue" :weight bold)
+             ("RECUR" :foreground "cornflowerblue" :weight bold)
+             ("APPT" :foreground "medium blue" :weight bold)
+             ("NOTE" :foreground "brown" :weight bold)
+             ("NEXT" :foreground "dark orange" :weight bold)
+             ("WAITING" :foreground "red" :weight bold)
+             ("CANCELLED" :foreground "dark violet" :weight bold)
+             ("DEFERRED" :foreground "dark blue" :weight bold)
+             ("SOMEDAY" :foreground "dark blue" :weight bold)
+             ("PROJECT" :foreground "#088e8e" :weight bold)))
+       :hook (org-mode . dl/org-mode-setup)
+       :config
+         (setq org-edit-src-content-indentation 2 ;; Indent code blocks by 2
+               org-ellipsis " ▾" ;; Prettify the fold indicator
+               org-hide-emphasis-markers t ;; Hide special characters
+               org-hide-block-startup nil) ;; Don't start org mode with blocks folded
+       :bind
+          (("C-c a" . org-agenda)))
+
+   (setq org-todo-keywords
+    '((sequence "TODO"
+        "RECUR"
+        "PROJECT"
+        "APPT"
+        "NOTE"
+        "NEXT"
+        "WAITING"
+        "DEFERRED"
+        "SOMEDAY"
+        "|"
+        "CANCELLED"
+        "DONE")))
 #+END_SRC
 
 *** Roam
 **** Install package
 #+NAME::org-roam-package
 #+BEGIN_SRC emacs-lisp
-  (use-package org-roam
-      :init
-        (setq org-roam-v2-ack t) ;; Turn off v2 warning
-        (org-roam-setup)
-        (add-to-list 'display-buffer-alist
-            '("\\*org-roam\\*"
-              (display-buffer-in-direction)
-              (direction . right)
-              (window-width . 0.33)
-              (window-height . fit-window-to-buffer)))
-      :custom
-        (org-roam-directory (file-truename "~/Projects/Writing/Roam/"))
-        (org-roam-dailies-directory "daily/")
-        (org-roam-completion-everywhere t)
-      :bind
-        (("C-c r b" . org-roam-buffer-toggle)
-         ("C-c r t" . org-roam-dailies-goto-today)
-         ("C-c r y" . org-roam-dailies-goto-yesterday)
-         ("C-M-n" . org-roam-node-insert)
-         :map org-mode-map
-         ("C-M-i"   . completion-at-point)
-         ("C-M-f" . org-roam-node-find)
-         ("C-<left>" . org-roam-dailies-goto-previous-note)
-         ("C-<right>" . org-roam-dailies-goto-next-note)))
+    (use-package org-roam
+        :init
+          (setq org-roam-v2-ack t) ;; Turn off v2 warning
+          (org-roam-setup)
+          (add-to-list 'display-buffer-alist
+              '("\\*org-roam\\*"
+                (display-buffer-in-direction)
+                (direction . right)
+                (window-width . 0.33)
+                (window-height . fit-window-to-buffer)))
+        :custom
+          (org-roam-directory (file-truename "~/Projects/Writing/Roam/"))
+          (org-roam-dailies-directory "daily/")
+          (org-roam-completion-everywhere t)
+        :bind
+          (("C-c r b" . org-roam-buffer-toggle)
+           ("C-c r t" . org-roam-dailies-goto-today)
+           ("C-c r y" . org-roam-dailies-goto-yesterday)
+           ("C-M-n" . org-roam-node-insert)
+           :map org-mode-map
+           ("C-M-i"   . completion-at-point)
+           ("C-M-f" . org-roam-node-find)
+           ("C-M-c" . dl/org-roam-create-id)
+           ("C-<left>" . org-roam-dailies-goto-previous-note)
+           ("C-<right>" . org-roam-dailies-goto-next-note)))
 #+END_SRC
 
 **** Configure templates
@@ -334,7 +361,7 @@ If you haven't heard of org mode, go watch [[https://www.youtube.com/watch?v=SzA
 **** Extending Roam
 Here we add additional function to org-roam to either do something specific for more workflow, or otherwise make ~org-roam~ more full featured.
 
-***** Set CREATED and LAST_MODIFIED tags on save
+***** Set CREATED and LAST_MODIFIED filetags on save
 I use the PROPERTIES drawer in my org-roam files to denote a few simple fields, such as as the node type. It would also be helpful to have some reliable timestamps. This code does that.
 
 #+NAME::org-roam-set-timestamps-on-save
@@ -387,6 +414,15 @@ I use the PROPERTIES drawer in my org-roam files to denote a few simple fields, 
       (dl/org-set-time-file-property "LAST_MODIFIED")))  
 #+END_SRC
 
+***** Set CREATED on node creation
+#+NAME::org-roam-set-timestamps-on-save
+#+BEGIN_SRC emacs-lisp
+  (defun dl/org-roam-create-id ()
+    (interactive)
+    (org-id-get-create)
+    (dl/org-set-created-property))
+#+END_SRC
+
 ***** Quick log entry header
 I map a leader key to let me quickly enter a log entry in my daily note. I prefer a just typing into a simple buffer with timestamp headers over more granular templates.
 
@@ -411,7 +447,7 @@ Note the weekly scope of the command's precision.")
 #+END_SRC
 
 *** Agenda
-**** Only use files with TODOs in org-agenda 
+**** Filter out files that don't include tasks in org-agenda 
 I use org-roam to take notes, which keeps many small files in the style of Zettelkasten. However, org-agenda doesn't perform well in this scenario. To fix this, we filter out all files from org-agenda that don't contain a ~TODO~. 
 
 #+NAME::org-mode
@@ -431,6 +467,62 @@ I use org-roam to take notes, which keeps many small files in the style of Zette
 
   ;; Roam Daily Log and Project Files only
    (setq org-agenda-files (dl/define-agenda-files))
+
+#+END_SRC
+
+**** Remove noise from task lists
+#+NAME::remove-noise-from-org-agenda
+#+BEGIN_SRC emacs-lisp 
+  (defun dl/buffer-prop-get (name)
+    "Get a buffer property called NAME as a string."
+    (org-with-point-at 1
+      (when (re-search-forward (concat "^#\\+" name ": \\(.*\\)")
+                               (point-max) t)
+        (buffer-substring-no-properties
+         (match-beginning 1)
+         (match-end 1)))))
+
+  (defun dl/agenda-category (&optional len)
+    "Get category of item at point for agenda.
+
+  Category is defined by one of the following items:
+
+  - CATEGORY property
+  - TITLE keyword
+  - TITLE property
+  - filename without directory and extension
+
+  When LEN is a number, resulting string is padded right with
+  spaces and then truncated with ... on the right if result is
+  longer than LEN.
+
+  Usage example:
+
+    (setq org-agenda-prefix-format
+          '((agenda . \" %(dl/agenda-category) %?-12t %12s\")))
+
+  Refer to `org-agenda-prefix-format' for more information."
+    (let* ((file-name (when buffer-file-name
+                        (file-name-sans-extension
+                         (file-name-nondirectory buffer-file-name))))
+           (title (dl/buffer-prop-get "title"))
+           (category (org-get-category))
+           (result
+            (or (if (and
+                     title
+                     (string-equal category file-name))
+                    title
+                  category)
+                "")))
+      (if (numberp len)
+          (s-truncate len (s-pad-right len " " result))
+        result)))
+
+  (setq org-agenda-prefix-format
+        '((agenda . " %i %(dl/agenda-category 12)%?-12t% s")
+          (todo . " %i %(dl/agenda-category 12) ")
+          (tags . " %i %(dl/agenda-category 12) ")
+          (search . " %i %(dl/agenda-category 12) ")))
 
 #+END_SRC
 
