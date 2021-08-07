@@ -355,7 +355,7 @@ If you haven't heard of org mode, go watch [[https://www.youtube.com/watch?v=SzA
     '(("d" "default" entry
        "* %?"
        :if-new (file+head "%<%Y-%m-%d>.org"
-                          "#+TITLE: %<%Y-%m-%d>\n#+CREATED: %U\n#+LAST_MODIFIED: %U\n\n* Log\n"))))
+                          "#+TITLE: %<%Y-%m-%d>\n#+filetags: Daily\n\n"))))
 #+END_SRC
 
 **** Extending Roam
