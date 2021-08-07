@@ -69,6 +69,7 @@ Straight.el fetchs packages over git via use-package.
 
   ;; Tells (use-package) to use straight.el to download packages
   ;; straight.el uses git packages, instead of the default bin files, which we like
+  ;; as it's much easier to open it up and hack it
   (setq straight-use-package-by-default t)
 #+END_SRC
 
@@ -362,7 +363,7 @@ If you haven't heard of org mode, go watch [[https://www.youtube.com/watch?v=SzA
 Here we add additional function to org-roam to either do something specific for more workflow, or otherwise make ~org-roam~ more full featured.
 
 ***** Set CREATED and LAST_MODIFIED filetags on save
-I use the PROPERTIES drawer in my org-roam files to denote a few simple fields, such as as the node type. It would also be helpful to have some reliable timestamps. This code does that.
+Sets timestamps in the Properties drawer of files. I intend to use this one day when rendering these notes as HTML, to quickly see files last touched.
 
 #+NAME::org-roam-set-timestamps-on-save
 #+BEGIN_SRC emacs-lisp
