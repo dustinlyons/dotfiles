@@ -182,11 +182,11 @@
   ;; Fast access to tag common contexts I use
   (setq org-tag-alist '(("@inbox" . ?i) ("@home" . ?h) ("@computer" . ?c) ("@phone" . ?p)))
 
-(add-hook 'org-finalize-agenda-hook
+(add-hook 'org-agenda-finalize-hook
   (lambda ()
     (save-excursion
-      (color-org-header "2021-08-01:" "azure" "black")
-      (color-org-header "2021-08-05:" "RosyBrown1" "red"))))
+      (color-org-header "2021-08-01" "azure" "black")
+      (color-org-header "2021-08-05" "RosyBrown1" "red"))))
 
 (defun color-org-header (tag backcolor forecolor)
   ""

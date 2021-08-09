@@ -620,15 +620,21 @@ This is what makes emacs possible for me. All evil mode packages and related con
 
 #+END_SRC
 
-** Utility packages
+** Utility packages and functions
 Various helpers and packages I find useful.
 
-*** Google
+*** Rotate
 #+BEGIN_SRC emacs-lisp
-  ;; You can probably guess
-  (use-package google-this
-    :config
-    (google-this-mode 1))
+
+  ;; Rotates windows and layouts
+  (use-package rotate
+    :config)
+
+  (dl/leader-keys
+    "r"  '(:ignore t :which-key "rotate")
+    "rw"  '(rotate-window :which-key "rotate window")
+    "rl"  '(rotate-layout :which-key "rotate layout"))
+
 #+END_SRC
 
 ** Managing projects
