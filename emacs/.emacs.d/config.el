@@ -34,6 +34,7 @@
 
 ;; Tells (use-package) to use straight.el to download packages
 ;; straight.el uses git packages, instead of the default bin files, which we like
+;; as it's much easier to open it up and hack it
 (setq straight-use-package-by-default t)
 
 ;; ESC will also cancel/quit/etc.
@@ -147,26 +148,14 @@
 (show-paren-mode t) ;; Highlights parans for me
 
 (defun dl/org-mode-setup ()
-   (org-indent-mode)
-   (variable-pitch-mode 1)
-   (auto-fill-mode 0)
-   (visual-line-mode 1)
-   (setq evil-auto-indent nil))
+    (org-indent-mode)
+    (variable-pitch-mode 1)
+    (auto-fill-mode 0)
+    (visual-line-mode 1)
+    (setq evil-auto-indent nil))
 
- (use-package org
+  (use-package org
     :defer t
-    :custom
-      '(org-todo-keyword-faces
-      '(("TODO" :foreground "medium blue" :weight bold)
-          ("RECUR" :foreground "cornflowerblue" :weight bold)
-          ("APPT" :foreground "medium blue" :weight bold)
-          ("NOTE" :foreground "brown" :weight bold)
-          ("NEXT" :foreground "dark orange" :weight bold)
-          ("WAITING" :foreground "red" :weight bold)
-          ("CANCELLED" :foreground "dark violet" :weight bold)
-          ("DEFERRED" :foreground "dark blue" :weight bold)
-          ("SOMEDAY" :foreground "dark blue" :weight bold)
-          ("PROJECT" :foreground "#088e8e" :weight bold)))
     :hook (org-mode . dl/org-mode-setup)
     :config
       (setq org-edit-src-content-indentation 2 ;; Indent code blocks by 2
@@ -176,19 +165,36 @@
     :bind
        (("C-c a" . org-agenda)))
 
-(setq org-todo-keywords
- '((sequence "TODO"
-     "RECUR"
-     "PROJECT"
-     "APPT"
-     "NOTE"
-     "NEXT"
-     "WAITING"
-     "DEFERRED"
-     "SOMEDAY"
-     "|"
-     "CANCELLED"
-     "DONE")))
+  (setq org-todo-keywords
+   '((sequence "TODO(t)"
+       "MAINTAIN(m)"
+       "NEXT(n)"
+       "WAITING(w)"
+       "SOMEDAY(s)"
+       "|"
+       "CANCELED(c)"
+       "DONE(d)")))
+
+  (setq org-todo-keyword-faces
+        '(("TODO" . org-warning) ("NEXT" . "yellow")
+          ("CANCELED" . (:foreground "blue" :weight bold))))
+
+  ;; Fast access to tag common contexts I use
+  (setq org-tag-alist '(("@inbox" . ?i) ("@home" . ?h) ("@computer" . ?c) ("@phone" . ?p)))
+
+(add-hook 'org-finalize-agenda-hook
+  (lambda ()
+    (save-excursion
+      (color-org-header "2021-08-01:" "azure" "black")
+      (color-org-header "2021-08-05:" "RosyBrown1" "red"))))
+
+(defun color-org-header (tag backcolor forecolor)
+  ""
+  (interactive)
+  (goto-char (point-min))
+  (while (re-search-forward tag nil t)
+    (add-text-properties (match-beginning 0) (+ (match-beginning 0) 10)
+                     `(face (:background, backcolor, :foreground, forecolor)))))
 
 (use-package org-roam
     :init
@@ -220,7 +226,7 @@
   '(("d" "default" entry
      "* %?"
      :if-new (file+head "%<%Y-%m-%d>.org"
-                        "#+TITLE: %<%Y-%m-%d>\n#+CREATED: %U\n#+LAST_MODIFIED: %U\n\n* Log\n"))))
+                        "#+TITLE: %<%Y-%m-%d>\n#+filetags: Daily\n\n"))))
 
 (defvar dl/org-created-property-name "CREATED")
 
@@ -300,8 +306,7 @@ Note the weekly scope of the command's precision.")
       :from tags
       :left-join nodes
       :on (= tags:node-id nodes:id)
-      :where (like tag (quote "%\"Project\"%"))]))))
-      ;;:where (or (like tag (quote "%\"Daily\"%")) (like tag (quote "%\"Project\"%")))])))
+      :where (in tag $v1)] '(["Project" "Daily"])))))
 
 ;; Roam Daily Log and Project Files only
  (setq org-agenda-files (dl/define-agenda-files))

@@ -273,23 +273,23 @@ If you haven't heard of org mode, go watch [[https://www.youtube.com/watch?v=SzA
 
 #+NAME::org-mode
 #+BEGIN_SRC emacs-lisp 
-   (defun dl/org-mode-setup ()
-     (org-indent-mode)
-     (variable-pitch-mode 1)
-     (auto-fill-mode 0)
-     (visual-line-mode 1)
-     (setq evil-auto-indent nil))
+  (defun dl/org-mode-setup ()
+    (org-indent-mode)
+    (variable-pitch-mode 1)
+    (auto-fill-mode 0)
+    (visual-line-mode 1)
+    (setq evil-auto-indent nil))
 
-   (use-package org
-      :defer t
-      :hook (org-mode . dl/org-mode-setup)
-      :config
-        (setq org-edit-src-content-indentation 2 ;; Indent code blocks by 2
-              org-ellipsis " ▾" ;; Prettify the fold indicator
-              org-hide-emphasis-markers t ;; Hide special characters
-              org-hide-block-startup nil) ;; Don't start org mode with blocks folded
-      :bind
-         (("C-c a" . org-agenda)))
+  (use-package org
+    :defer t
+    :hook (org-mode . dl/org-mode-setup)
+    :config
+      (setq org-edit-src-content-indentation 2 ;; Indent code blocks by 2
+            org-ellipsis " ▾" ;; Prettify the fold indicator
+            org-hide-emphasis-markers t ;; Hide special characters
+            org-hide-block-startup nil) ;; Don't start org mode with blocks folded
+    :bind
+       (("C-c a" . org-agenda)))
 
   (setq org-todo-keywords
    '((sequence "TODO(t)"
@@ -304,6 +304,24 @@ If you haven't heard of org mode, go watch [[https://www.youtube.com/watch?v=SzA
   (setq org-todo-keyword-faces
         '(("TODO" . org-warning) ("NEXT" . "yellow")
           ("CANCELED" . (:foreground "blue" :weight bold))))
+
+  ;; Fast access to tag common contexts I use
+  (setq org-tag-alist '(("@inbox" . ?i) ("@home" . ?h) ("@computer" . ?c) ("@phone" . ?p)))
+
+(add-hook 'org-agenda-finalize-hook
+  (lambda ()
+    (save-excursion
+      (color-org-header "2021-08-01" "azure" "black")
+      (color-org-header "2021-08-05" "RosyBrown1" "red"))))
+
+(defun color-org-header (tag backcolor forecolor)
+  ""
+  (interactive)
+  (goto-char (point-min))
+  (while (re-search-forward tag nil t)
+    (add-text-properties (match-beginning 0) (+ (match-beginning 0) 10)
+                     `(face (:background, backcolor, :foreground, forecolor)))))
+
 #+END_SRC
 
 *** Roam
