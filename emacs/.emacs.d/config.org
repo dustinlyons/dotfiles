@@ -272,49 +272,41 @@ If you haven't heard of org mode, go watch [[https://www.youtube.com/watch?v=SzA
 
 #+NAME::org-mode
 #+BEGIN_SRC emacs-lisp 
-    (defun dl/org-mode-setup ()
-      (org-indent-mode)
-      (variable-pitch-mode 1)
-      (auto-fill-mode 0)
-      (visual-line-mode 1)
-      (setq evil-auto-indent nil))
+   (defun dl/org-mode-setup ()
+     (org-indent-mode)
+     (variable-pitch-mode 1)
+     (auto-fill-mode 0)
+     (visual-line-mode 1)
+     (setq evil-auto-indent nil))
 
-    (use-package org
-       :defer t
-       :custom
-         '(org-todo-keyword-faces
-         '(("TODO" :foreground "medium blue" :weight bold)
-             ("RECUR" :foreground "cornflowerblue" :weight bold)
-             ("APPT" :foreground "medium blue" :weight bold)
-             ("NOTE" :foreground "brown" :weight bold)
-             ("NEXT" :foreground "dark orange" :weight bold)
-             ("WAITING" :foreground "red" :weight bold)
-             ("CANCELLED" :foreground "dark violet" :weight bold)
-             ("DEFERRED" :foreground "dark blue" :weight bold)
-             ("SOMEDAY" :foreground "dark blue" :weight bold)
-             ("PROJECT" :foreground "#088e8e" :weight bold)))
-       :hook (org-mode . dl/org-mode-setup)
-       :config
-         (setq org-edit-src-content-indentation 2 ;; Indent code blocks by 2
-               org-ellipsis " ▾" ;; Prettify the fold indicator
-               org-hide-emphasis-markers t ;; Hide special characters
-               org-hide-block-startup nil) ;; Don't start org mode with blocks folded
-       :bind
-          (("C-c a" . org-agenda)))
+   (use-package org
+      :defer t
+      :hook (org-mode . dl/org-mode-setup)
+      :config
+        (setq org-edit-src-content-indentation 2 ;; Indent code blocks by 2
+              org-ellipsis " ▾" ;; Prettify the fold indicator
+              org-hide-emphasis-markers t ;; Hide special characters
+              org-hide-block-startup nil) ;; Don't start org mode with blocks folded
+      :bind
+         (("C-c a" . org-agenda)))
 
-   (setq org-todo-keywords
-    '((sequence "TODO"
-        "RECUR"
-        "PROJECT"
-        "APPT"
-        "NOTE"
-        "NEXT"
-        "WAITING"
-        "DEFERRED"
-        "SOMEDAY"
-        "|"
-        "CANCELLED"
-        "DONE")))
+  (setq org-todo-keywords
+   '((sequence "TODO"
+       "RECUR"
+       "PROJECT"
+       "APPT"
+       "NOTE"
+       "NEXT"
+       "WAITING"
+       "DEFERRED"
+       "SOMEDAY"
+       "|"
+       "CANCELED"
+       "DONE")))
+
+  (setq org-todo-keyword-faces
+        '(("TODO" . org-warning) ("NEXT" . "yellow")
+          ("CANCELED" . (:foreground "blue" :weight bold))))
 #+END_SRC
 
 *** Roam
