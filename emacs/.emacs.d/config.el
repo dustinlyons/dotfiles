@@ -179,9 +179,6 @@
         '(("TODO" . org-warning) ("NEXT" . "yellow")
           ("CANCELED" . (:foreground "blue" :weight bold))))
 
-  ;; Fast access to tag common contexts I use
-  (setq org-tag-alist '(("@inbox" . ?i) ("@home" . ?h) ("@computer" . ?c) ("@phone" . ?p)))
-
 (add-hook 'org-agenda-finalize-hook
   (lambda ()
     (save-excursion
@@ -196,31 +193,41 @@
     (add-text-properties (match-beginning 0) (+ (match-beginning 0) 10)
                      `(face (:background, backcolor, :foreground, forecolor)))))
 
+;; Hide these tags
+;;(setq org-agenda-hide-tags-regexp (regexp-opt '("Daily" "Active")))
+;; Fast access to tag common contexts I use
+(setq org-tag-persistent-alist '(("@inbox" . ?i) ("@home" . ?h) ("@computer" . ?c) ("@phone" . ?p)))
+(setq org-agenda-custom-commands
+      '(("p" tags "PROJECT-SOMEDAY-DONE" nil)  ;; (1) Active Projects
+        ("m" tags "PROJECT&SOMEDAY" nil)       ;; (2) All Projects
+        ("d" tags "PROJECT&DONE" nil)          ;; (3) Completed Projects
+       ))
+
 (use-package org-roam
-    :init
-      (setq org-roam-v2-ack t) ;; Turn off v2 warning
-      (org-roam-setup)
-      (add-to-list 'display-buffer-alist
-          '("\\*org-roam\\*"
-            (display-buffer-in-direction)
-            (direction . right)
-            (window-width . 0.33)
-            (window-height . fit-window-to-buffer)))
-    :custom
-      (org-roam-directory (file-truename "~/Projects/Writing/Roam/"))
-      (org-roam-dailies-directory "daily/")
-      (org-roam-completion-everywhere t)
-    :bind
-      (("C-c r b" . org-roam-buffer-toggle)
-       ("C-c r t" . org-roam-dailies-goto-today)
-       ("C-c r y" . org-roam-dailies-goto-yesterday)
-       ("C-M-n" . org-roam-node-insert)
-       :map org-mode-map
-       ("C-M-i"   . completion-at-point)
-       ("C-M-f" . org-roam-node-find)
-       ("C-M-c" . dl/org-roam-create-id)
-       ("C-<left>" . org-roam-dailies-goto-previous-note)
-       ("C-<right>" . org-roam-dailies-goto-next-note)))
+     :init
+       (setq org-roam-v2-ack t) ;; Turn off v2 warning
+       (org-roam-setup)
+       (add-to-list 'display-buffer-alist
+           '("\\*org-roam\\*"
+             (display-buffer-in-direction)
+             (direction . right)
+             (window-width . 0.33)
+             (window-height . fit-window-to-buffer)))
+     :custom
+       (org-roam-directory (file-truename "~/Projects/Writing/Roam/"))
+       (org-roam-dailies-directory "daily/")
+       (org-roam-completion-everywhere t)
+     :bind
+       (("C-c r b" . org-roam-buffer-toggle)
+        ("C-c r t" . org-roam-dailies-goto-today)
+        ("C-c r y" . org-roam-dailies-goto-yesterday)
+        ("C-M-n" . org-roam-node-insert)
+        :map org-mode-map
+        ("C-M-i"   . completion-at-point)
+        ("C-M-f" . org-roam-node-find)
+        ("C-M-c" . dl/org-roam-create-id)
+        ("C-<left>" . org-roam-dailies-goto-previous-note)
+        ("C-<right>" . org-roam-dailies-goto-next-note)))
 
 (setq org-roam-dailies-capture-templates
   '(("d" "default" entry
@@ -426,10 +433,14 @@ Note the weekly scope of the command's precision.")
   (evil-set-undo-system 'undo-tree)
   (global-undo-tree-mode 1))
 
-;; You can probably guess
-(use-package google-this
-  :config
-  (google-this-mode 1))
+;; Rotates windows and layouts
+(use-package rotate
+  :config)
+
+(dl/leader-keys
+  "r"  '(:ignore t :which-key "rotate")
+  "rw"  '(rotate-window :which-key "rotate window")
+  "rl"  '(rotate-layout :which-key "rotate layout"))
 
 (let ((code_dir_path '"\"~/Projects/Code\""))
 (use-package projectile

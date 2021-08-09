@@ -284,75 +284,83 @@ If you haven't heard of org mode, go watch [[https://www.youtube.com/watch?v=SzA
     :defer t
     :hook (org-mode . dl/org-mode-setup)
     :config
-      (setq org-edit-src-content-indentation 2 ;; Indent code blocks by 2
-            org-ellipsis " ▾" ;; Prettify the fold indicator
-            org-hide-emphasis-markers t ;; Hide special characters
-            org-hide-block-startup nil) ;; Don't start org mode with blocks folded
+    (setq org-edit-src-content-indentation 2 ;; Indent code blocks by 2
+          org-ellipsis " ▾" ;; Prettify the fold indicator
+          org-hide-emphasis-markers t ;; Hide special characters
+          org-hide-block-startup nil) ;; Don't start org mode with blocks folded
     :bind
-       (("C-c a" . org-agenda)))
-
+          (("C-c a" . org-agenda)))
   (setq org-todo-keywords
-   '((sequence "TODO(t)"
-       "MAINTAIN(m)"
-       "NEXT(n)"
-       "WAITING(w)"
-       "SOMEDAY(s)"
-       "|"
-       "CANCELED(c)"
-       "DONE(d)")))
+     '((sequence "TODO(t)"
+                 "MAINTAIN(m)"
+                 "NEXT(n)"
+                 "WAITING(w)"
+                 "SOMEDAY(s)"
+                 "|"
+                 "CANCELED(c)"
+                 "DONE(d)")))
 
   (setq org-todo-keyword-faces
-        '(("TODO" . org-warning) ("NEXT" . "yellow")
-          ("CANCELED" . (:foreground "blue" :weight bold))))
+    '(("TODO" . org-warning) ("NEXT" . "yellow")
+      ("CANCELED" . (:foreground "blue" :weight bold))))
 
-  ;; Fast access to tag common contexts I use
-  (setq org-tag-alist '(("@inbox" . ?i) ("@home" . ?h) ("@computer" . ?c) ("@phone" . ?p)))
-
-(add-hook 'org-agenda-finalize-hook
-  (lambda ()
-    (save-excursion
+  (add-hook 'org-agenda-finalize-hook
+    (lambda ()
+      (save-excursion
       (color-org-header "2021-08-01" "azure" "black")
       (color-org-header "2021-08-05" "RosyBrown1" "red"))))
 
-(defun color-org-header (tag backcolor forecolor)
-  ""
-  (interactive)
-  (goto-char (point-min))
-  (while (re-search-forward tag nil t)
+  (defun color-org-header (tag backcolor forecolor)
+    (interactive)
+    (goto-char (point-min))
+    (while (re-search-forward tag nil t)
     (add-text-properties (match-beginning 0) (+ (match-beginning 0) 10)
-                     `(face (:background, backcolor, :foreground, forecolor)))))
+      `(face (:background, backcolor, :foreground, forecolor)))))
 
+  ;; Fast access to tag common contexts I use
+  (setq org-tag-persistent-alist '(
+    ("@inbox" . ?i)
+    ("@home" . ?h)
+    ("@computer" . ?c)
+    ("@phone" . ?p)
+    ("@active" . ?a)))
+
+  (setq org-agenda-custom-commands
+   '(("p" tags "PROJECT-SOMEDAY-DONE" nil)  ;; (1) Active Projects
+     ("m" tags "PROJECT&SOMEDAY" nil)       ;; (2) All Projects
+     ("d" tags "PROJECT&DONE" nil)))          ;; (3) Completed Projects
+ 
 #+END_SRC
 
 *** Roam
 **** Install package
 #+NAME::org-roam-package
 #+BEGIN_SRC emacs-lisp
-    (use-package org-roam
-        :init
-          (setq org-roam-v2-ack t) ;; Turn off v2 warning
-          (org-roam-setup)
-          (add-to-list 'display-buffer-alist
-              '("\\*org-roam\\*"
-                (display-buffer-in-direction)
-                (direction . right)
-                (window-width . 0.33)
-                (window-height . fit-window-to-buffer)))
-        :custom
-          (org-roam-directory (file-truename "~/Projects/Writing/Roam/"))
-          (org-roam-dailies-directory "daily/")
-          (org-roam-completion-everywhere t)
-        :bind
-          (("C-c r b" . org-roam-buffer-toggle)
-           ("C-c r t" . org-roam-dailies-goto-today)
-           ("C-c r y" . org-roam-dailies-goto-yesterday)
-           ("C-M-n" . org-roam-node-insert)
-           :map org-mode-map
-           ("C-M-i"   . completion-at-point)
-           ("C-M-f" . org-roam-node-find)
-           ("C-M-c" . dl/org-roam-create-id)
-           ("C-<left>" . org-roam-dailies-goto-previous-note)
-           ("C-<right>" . org-roam-dailies-goto-next-note)))
+  (use-package org-roam
+       :init
+         (setq org-roam-v2-ack t) ;; Turn off v2 warning
+         (org-roam-setup)
+         (add-to-list 'display-buffer-alist
+             '("\\*org-roam\\*"
+               (display-buffer-in-direction)
+               (direction . right)
+               (window-width . 0.33)
+               (window-height . fit-window-to-buffer)))
+       :custom
+         (org-roam-directory (file-truename "~/Projects/Writing/Roam/"))
+         (org-roam-dailies-directory "daily/")
+         (org-roam-completion-everywhere t)
+       :bind
+         (("C-c r b" . org-roam-buffer-toggle)
+          ("C-c r t" . org-roam-dailies-goto-today)
+          ("C-c r y" . org-roam-dailies-goto-yesterday)
+          ("C-M-n" . org-roam-node-insert)
+          :map org-mode-map
+          ("C-M-i"   . completion-at-point)
+          ("C-M-f" . org-roam-node-find)
+          ("C-M-c" . dl/org-roam-create-id)
+          ("C-<left>" . org-roam-dailies-goto-previous-note)
+          ("C-<right>" . org-roam-dailies-goto-next-note)))
 #+END_SRC
 
 **** Configure templates
