@@ -292,18 +292,14 @@ If you haven't heard of org mode, go watch [[https://www.youtube.com/watch?v=SzA
          (("C-c a" . org-agenda)))
 
   (setq org-todo-keywords
-   '((sequence "TODO"
-       "RECUR"
-       "PROJECT"
-       "APPT"
-       "NOTE"
-       "NEXT"
-       "WAITING"
-       "DEFERRED"
-       "SOMEDAY"
+   '((sequence "TODO(t)"
+       "MAINTAIN(m)"
+       "NEXT(n)"
+       "WAITING(w)"
+       "SOMEDAY(s)"
        "|"
-       "CANCELED"
-       "DONE")))
+       "CANCELED(c)"
+       "DONE(d)")))
 
   (setq org-todo-keyword-faces
         '(("TODO" . org-warning) ("NEXT" . "yellow")
