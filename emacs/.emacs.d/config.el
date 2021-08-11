@@ -148,60 +148,61 @@
 (show-paren-mode t) ;; Highlights parans for me
 
 (defun dl/org-mode-setup ()
-    (org-indent-mode)
-    (variable-pitch-mode 1)
-    (auto-fill-mode 0)
-    (visual-line-mode 1)
-    (setq evil-auto-indent nil))
+  (org-indent-mode)
+  (variable-pitch-mode 1)
+  (auto-fill-mode 0)
+  (visual-line-mode 1)
+  (setq evil-auto-indent nil))
 
-  (use-package org
-    :defer t
-    :hook (org-mode . dl/org-mode-setup)
-    :config
-      (setq org-edit-src-content-indentation 2 ;; Indent code blocks by 2
-            org-ellipsis " ▾" ;; Prettify the fold indicator
-            org-hide-emphasis-markers t ;; Hide special characters
-            org-hide-block-startup nil) ;; Don't start org mode with blocks folded
-    :bind
-       (("C-c a" . org-agenda)))
-
-  (setq org-todo-keywords
+(use-package org
+  :defer t
+  :hook (org-mode . dl/org-mode-setup)
+  :config
+  (setq org-edit-src-content-indentation 2 ;; Indent code blocks by 2
+        org-ellipsis " ▾" ;; Prettify the fold indicator
+        org-hide-emphasis-markers t ;; Hide special characters
+        org-hide-block-startup nil) ;; Don't start org mode with blocks folded
+  :bind
+        (("C-c a" . org-agenda)))
+(setq org-todo-keywords
    '((sequence "TODO(t)"
-       "MAINTAIN(m)"
-       "NEXT(n)"
-       "WAITING(w)"
-       "SOMEDAY(s)"
-       "|"
-       "CANCELED(c)"
-       "DONE(d)")))
+               "MAINTAIN(m)"
+               "NEXT(n)"
+               "WAITING(w)"
+               "SOMEDAY(s)"
+               "|"
+               "CANCELED(c)"
+               "DONE(d)")))
 
-  (setq org-todo-keyword-faces
-        '(("TODO" . org-warning) ("NEXT" . "yellow")
-          ("CANCELED" . (:foreground "blue" :weight bold))))
+(setq org-todo-keyword-faces
+  '(("TODO" . org-warning) ("NEXT" . "yellow")
+    ("CANCELED" . (:foreground "blue" :weight bold))))
 
 (add-hook 'org-agenda-finalize-hook
   (lambda ()
     (save-excursion
-      (color-org-header "2021-08-01" "azure" "black")
-      (color-org-header "2021-08-05" "RosyBrown1" "red"))))
+    (color-org-header "2021-08-01" "azure" "black")
+    (color-org-header "2021-08-05" "RosyBrown1" "red"))))
 
 (defun color-org-header (tag backcolor forecolor)
-  ""
   (interactive)
   (goto-char (point-min))
   (while (re-search-forward tag nil t)
-    (add-text-properties (match-beginning 0) (+ (match-beginning 0) 10)
-                     `(face (:background, backcolor, :foreground, forecolor)))))
+  (add-text-properties (match-beginning 0) (+ (match-beginning 0) 10)
+    `(face (:background, backcolor, :foreground, forecolor)))))
 
-;; Hide these tags
-;;(setq org-agenda-hide-tags-regexp (regexp-opt '("Daily" "Active")))
 ;; Fast access to tag common contexts I use
-(setq org-tag-persistent-alist '(("@inbox" . ?i) ("@home" . ?h) ("@computer" . ?c) ("@phone" . ?p)))
+(setq org-tag-persistent-alist '(
+  ("@inbox" . ?i)
+  ("@home" . ?h)
+  ("@computer" . ?c)
+  ("@phone" . ?p)
+  ("@active" . ?a)))
+
 (setq org-agenda-custom-commands
-      '(("p" tags "PROJECT-SOMEDAY-DONE" nil)  ;; (1) Active Projects
-        ("m" tags "PROJECT&SOMEDAY" nil)       ;; (2) All Projects
-        ("d" tags "PROJECT&DONE" nil)          ;; (3) Completed Projects
-       ))
+ '(("p" tags "PROJECT-SOMEDAY-DONE" nil)  ;; (1) Active Projects
+   ("m" tags "PROJECT&SOMEDAY" nil)       ;; (2) All Projects
+   ("d" tags "PROJECT&DONE" nil)))          ;; (3) Completed Projects
 
 (use-package org-roam
      :init
@@ -301,6 +302,24 @@ Note the weekly scope of the command's precision.")
 
  (dl/leader-keys
   ","  '(insert-current-time :which-key "current time"))
+
+(setq org-roam-capture-templates
+ '(("d" "default" plain
+    "%?"
+    :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
+    :unnarrowed t)
+   ("p" "project" plain
+    "\n#+filetags: Project\n\n* Goals\n%^{Goals}\n* Tasks\n** TODO %?"
+    :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}")
+    :unnarrowed t)
+   ("e" "people" plain
+    "\n#+filetags: CRM People\nRelationship: %^{Relationship}\n%?"
+    :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}")
+    :unnarrowed t)
+   ("i" "institution" plain
+    "\n#+filetags: CRM Institution\nRelationship: %^{Relationship}\n%?"
+    :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}")
+    :unnarrowed t)))
 
 (defun dl/define-agenda-files ()
   "Return a list of note files containing 'HasTodo' tag. 
