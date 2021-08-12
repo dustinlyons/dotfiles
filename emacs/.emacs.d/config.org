@@ -472,11 +472,11 @@ These are templates used to create new notes.
       :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}")
       :unnarrowed t)
      ("e" "people" plain
-      "#+filetags: CRM People\n\nRelationship:: %^{Relationship}\nPhone:\nAddress:\nBirthday:\n\n %?"
+      "#+filetags: People CRM\n\nRelationship: %^{Relationship}\nPhone:\nAddress:\nBirthday:\n\n %?"
       :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}")
       :unnarrowed t)
      ("i" "institution" plain
-      "#+filetags: CRM Institution\n\nRelationship: %^{Relationship}\nPhone:\nAddress:\n\n %?"
+      "#+filetags: Institution CRM\n\nRelationship: %^{Relationship}\nPhone:\nAddress:\n\n %?"
       :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}")
       :unnarrowed t)))
 #+END_SRC
