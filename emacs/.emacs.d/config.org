@@ -457,6 +457,30 @@ Note the weekly scope of the command's precision.")
 
 #+END_SRC
 
+***** Roam capture templates
+These are templates used to create new notes.
+
+#+NAME::roam-templates
+#+BEGIN_SRC emacs-lisp
+  (setq org-roam-capture-templates
+   '(("d" "default" plain
+      "%?"
+      :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n\n")
+      :unnarrowed t)
+     ("p" "project" plain
+      "#+filetags: Project\n\n* Goals\n\n%^{Goals}\n\n* Tasks\n\n** TODO %?"
+      :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}")
+      :unnarrowed t)
+     ("e" "people" plain
+      "#+filetags: CRM People\n\nRelationship:: %^{Relationship}\nPhone:\nAddress:\nBirthday:\n\n %?"
+      :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}")
+      :unnarrowed t)
+     ("i" "institution" plain
+      "#+filetags: CRM Institution\n\nRelationship: %^{Relationship}\nPhone:\nAddress:\n\n %?"
+      :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}")
+      :unnarrowed t)))
+#+END_SRC
+
 *** Agenda
 **** Filter out files that don't include tasks in org-agenda 
 I use org-roam to take notes, which keeps many small files in the style of Zettelkasten. However, org-agenda doesn't perform well in this scenario. To fix this, we filter out all files from org-agenda that don't contain a ~TODO~. 

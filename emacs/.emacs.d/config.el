@@ -298,6 +298,24 @@ Note the weekly scope of the command's precision.")
  (dl/leader-keys
   ","  '(insert-current-time :which-key "current time"))
 
+(setq org-roam-capture-templates
+ '(("d" "default" plain
+    "%?"
+    :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
+    :unnarrowed t)
+   ("p" "project" plain
+    "\n#+filetags: Project\n\n* Goals\n%^{Goals}\n* Tasks\n** TODO %?"
+    :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}")
+    :unnarrowed t)
+   ("e" "people" plain
+    "\n#+filetags: CRM People\nRelationship: %^{Relationship}\n%?"
+    :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}")
+    :unnarrowed t)
+   ("i" "institution" plain
+    "\n#+filetags: CRM Institution\nRelationship: %^{Relationship}\n%?"
+    :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}")
+    :unnarrowed t)))
+
 (defun dl/define-agenda-files ()
   "Return a list of note files containing 'HasTodo' tag. 
    I use this to denote files with tasks for org-agenda" ;
