@@ -1,5 +1,6 @@
 #+TITLE: Dustin Lyons' emacs configuration
 #+CONSTANTS: code_dir_path="~/Projects/Code"
+#+STARTUP: content
 
 * Configuration   :emacs:
 
@@ -318,18 +319,13 @@ If you haven't heard of org mode, go watch [[https://www.youtube.com/watch?v=SzA
       `(face (:background, backcolor, :foreground, forecolor)))))
 
   ;; Fast access to tag common contexts I use
-  (setq org-tag-persistent-alist '(
-    ("@inbox" . ?i)
-    ("@home" . ?h)
-    ("@computer" . ?c)
-    ("@phone" . ?p)
-    ("@active" . ?a)))
+  (setq org-tag-persistent-alist '(("@inbox" . ?i) ("@home" . ?h) ("@errands" . ?e) ("@office" . ?o) ("@phone" . ?p) ("@computer" . ?c) ("@amanda" . ?a) ("@someday" . ?s)))
 
   (setq org-agenda-custom-commands
    '(("p" tags "PROJECT-SOMEDAY-DONE" nil)  ;; (1) Active Projects
      ("m" tags "PROJECT&SOMEDAY" nil)       ;; (2) All Projects
      ("d" tags "PROJECT&DONE" nil)))          ;; (3) Completed Projects
- 
+
 #+END_SRC
 
 *** Roam
@@ -785,7 +781,7 @@ File finder and associated helpers that uses the minibuffer (the info window at 
       erc-modules
       '(autoaway autojoin button completion fill irccontrols keep-place
           list match menu move-to-prompt netsplit networks noncommands
-          readonly ring stamp track image hl-nicks notify notifications)))
+          readonly ring stamp track image hl-nicks notify)))
 #+END_SRC
 
 ** Learning emacs

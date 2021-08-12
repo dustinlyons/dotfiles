@@ -148,60 +148,56 @@
 (show-paren-mode t) ;; Highlights parans for me
 
 (defun dl/org-mode-setup ()
-    (org-indent-mode)
-    (variable-pitch-mode 1)
-    (auto-fill-mode 0)
-    (visual-line-mode 1)
-    (setq evil-auto-indent nil))
+  (org-indent-mode)
+  (variable-pitch-mode 1)
+  (auto-fill-mode 0)
+  (visual-line-mode 1)
+  (setq evil-auto-indent nil))
 
-  (use-package org
-    :defer t
-    :hook (org-mode . dl/org-mode-setup)
-    :config
-      (setq org-edit-src-content-indentation 2 ;; Indent code blocks by 2
-            org-ellipsis " ▾" ;; Prettify the fold indicator
-            org-hide-emphasis-markers t ;; Hide special characters
-            org-hide-block-startup nil) ;; Don't start org mode with blocks folded
-    :bind
-       (("C-c a" . org-agenda)))
-
-  (setq org-todo-keywords
+(use-package org
+  :defer t
+  :hook (org-mode . dl/org-mode-setup)
+  :config
+  (setq org-edit-src-content-indentation 2 ;; Indent code blocks by 2
+        org-ellipsis " ▾" ;; Prettify the fold indicator
+        org-hide-emphasis-markers t ;; Hide special characters
+        org-hide-block-startup nil) ;; Don't start org mode with blocks folded
+  :bind
+        (("C-c a" . org-agenda)))
+(setq org-todo-keywords
    '((sequence "TODO(t)"
-       "MAINTAIN(m)"
-       "NEXT(n)"
-       "WAITING(w)"
-       "SOMEDAY(s)"
-       "|"
-       "CANCELED(c)"
-       "DONE(d)")))
+               "MAINTAIN(m)"
+               "NEXT(n)"
+               "WAITING(w)"
+               "SOMEDAY(s)"
+               "|"
+               "CANCELED(c)"
+               "DONE(d)")))
 
-  (setq org-todo-keyword-faces
-        '(("TODO" . org-warning) ("NEXT" . "yellow")
-          ("CANCELED" . (:foreground "blue" :weight bold))))
+(setq org-todo-keyword-faces
+  '(("TODO" . org-warning) ("NEXT" . "yellow")
+    ("CANCELED" . (:foreground "blue" :weight bold))))
 
 (add-hook 'org-agenda-finalize-hook
   (lambda ()
     (save-excursion
-      (color-org-header "2021-08-01" "azure" "black")
-      (color-org-header "2021-08-05" "RosyBrown1" "red"))))
+    (color-org-header "2021-08-01" "azure" "black")
+    (color-org-header "2021-08-05" "RosyBrown1" "red"))))
 
 (defun color-org-header (tag backcolor forecolor)
-  ""
   (interactive)
   (goto-char (point-min))
   (while (re-search-forward tag nil t)
-    (add-text-properties (match-beginning 0) (+ (match-beginning 0) 10)
-                     `(face (:background, backcolor, :foreground, forecolor)))))
+  (add-text-properties (match-beginning 0) (+ (match-beginning 0) 10)
+    `(face (:background, backcolor, :foreground, forecolor)))))
 
-;; Hide these tags
-;;(setq org-agenda-hide-tags-regexp (regexp-opt '("Daily" "Active")))
 ;; Fast access to tag common contexts I use
-(setq org-tag-persistent-alist '(("@inbox" . ?i) ("@home" . ?h) ("@computer" . ?c) ("@phone" . ?p)))
+(setq org-tag-persistent-alist '(("@inbox" . ?i) ("@home" . ?h) ("@errands" . ?e) ("@office" . ?o) ("@phone" . ?p) ("@computer" . ?c) ("@active" . ?a) ("@someday" . ?s)))
+
 (setq org-agenda-custom-commands
-      '(("p" tags "PROJECT-SOMEDAY-DONE" nil)  ;; (1) Active Projects
-        ("m" tags "PROJECT&SOMEDAY" nil)       ;; (2) All Projects
-        ("d" tags "PROJECT&DONE" nil)          ;; (3) Completed Projects
-       ))
+ '(("p" tags "PROJECT-SOMEDAY-DONE" nil)  ;; (1) Active Projects
+   ("m" tags "PROJECT&SOMEDAY" nil)       ;; (2) All Projects
+   ("d" tags "PROJECT&DONE" nil)))          ;; (3) Completed Projects
 
 (use-package org-roam
      :init
@@ -350,6 +346,23 @@ Note the weekly scope of the command's precision.")
         (todo . " %i %(dl/agenda-category 12) ")
         (tags . " %i %(dl/agenda-category 12) ")
         (search . " %i %(dl/agenda-category 12) ")))
+
+(use-package org-super-agenda
+  :ensure t
+  :config
+  (setq org-super-agenda-groups '((:name "Today"
+					 :time-grid t
+					 :scheduled today)
+				  (:name "Due today"
+					 :deadline today)
+				  (:name "Important"
+					 :priority "A")
+				  (:name "Overdue"
+					 :deadline past)
+				  (:name "Due soon"
+					 :deadline future)
+				  (:name "Waiting"
+					 :todo "WAIT"))))
 
 (use-package org-superstar
   :after org
