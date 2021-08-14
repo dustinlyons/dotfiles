@@ -192,7 +192,7 @@
     `(face (:background, backcolor, :foreground, forecolor)))))
 
 ;; Fast access to tag common contexts I use
-(setq org-tag-persistent-alist '(("@inbox" . ?i) ("@home" . ?h) ("@errands" . ?e) ("@office" . ?o) ("@phone" . ?p) ("@computer" . ?c) ("@active" . ?a) ("@someday" . ?s)))
+(setq org-tag-persistent-alist '(("Inbox" . ?i) ("@Home" . ?h) ("@Amanda" . ?a) ("@Car" . ?c) ("@Office" . ?o) ("#Phone" . ?p) ("#Computer" . ?u)))
 
 (setq org-agenda-custom-commands
  '(("p" tags "PROJECT-SOMEDAY-DONE" nil)  ;; (1) Active Projects
@@ -301,18 +301,18 @@ Note the weekly scope of the command's precision.")
 (setq org-roam-capture-templates
  '(("d" "default" plain
     "%?"
-    :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
+    :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n\n")
     :unnarrowed t)
    ("p" "project" plain
-    "\n#+filetags: Project\n\n* Goals\n%^{Goals}\n* Tasks\n** TODO %?"
+    "#+filetags: Project\n\n* Goals\n\n%^{Goals}\n\n* Tasks\n\n** TODO %?"
     :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}")
     :unnarrowed t)
    ("e" "people" plain
-    "\n#+filetags: CRM People\nRelationship: %^{Relationship}\n%?"
+    "#+filetags: People CRM\n\nRelationship: %^{Relationship}\nPhone:\nAddress:\nBirthday:\n\n %?"
     :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}")
     :unnarrowed t)
    ("i" "institution" plain
-    "\n#+filetags: CRM Institution\nRelationship: %^{Relationship}\n%?"
+    "#+filetags: Institution CRM\n\nRelationship: %^{Relationship}\nPhone:\nAddress:\n\n %?"
     :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}")
     :unnarrowed t)))
 
@@ -364,23 +364,6 @@ Note the weekly scope of the command's precision.")
         (todo . " %i %(dl/agenda-category 12) ")
         (tags . " %i %(dl/agenda-category 12) ")
         (search . " %i %(dl/agenda-category 12) ")))
-
-(use-package org-super-agenda
-  :ensure t
-  :config
-  (setq org-super-agenda-groups '((:name "Today"
-					 :time-grid t
-					 :scheduled today)
-				  (:name "Due today"
-					 :deadline today)
-				  (:name "Important"
-					 :priority "A")
-				  (:name "Overdue"
-					 :deadline past)
-				  (:name "Due soon"
-					 :deadline future)
-				  (:name "Waiting"
-					 :todo "WAIT"))))
 
 (use-package org-superstar
   :after org
@@ -582,7 +565,7 @@ Note the weekly scope of the command's precision.")
       erc-modules
       '(autoaway autojoin button completion fill irccontrols keep-place
           list match menu move-to-prompt netsplit networks noncommands
-          readonly ring stamp track image hl-nicks notify notifications)))
+          readonly ring stamp track image hl-nicks notify)))
 
 (setq org-src-tab-acts-natively t)
 

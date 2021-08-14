@@ -319,7 +319,7 @@ If you haven't heard of org mode, go watch [[https://www.youtube.com/watch?v=SzA
       `(face (:background, backcolor, :foreground, forecolor)))))
 
   ;; Fast access to tag common contexts I use
-  (setq org-tag-persistent-alist '(("@inbox" . ?i) ("@home" . ?h) ("@errands" . ?e) ("@office" . ?o) ("@phone" . ?p) ("@computer" . ?c) ("@amanda" . ?a) ("@someday" . ?s)))
+  (setq org-tag-persistent-alist '(("Inbox" . ?i) ("@Home" . ?h) ("@Amanda" . ?a) ("@Car" . ?c) ("@Office" . ?o) ("#Phone" . ?p) ("#Computer" . ?u)))
 
   (setq org-agenda-custom-commands
    '(("p" tags "PROJECT-SOMEDAY-DONE" nil)  ;; (1) Active Projects
@@ -542,6 +542,23 @@ This block sets the ~org-agenda-prefix-format~ in an friendly way for org-roam (
           (todo . " %i %(dl/agenda-category 12) ")
           (tags . " %i %(dl/agenda-category 12) ")
           (search . " %i %(dl/agenda-category 12) ")))
+#+END_SRC
+
+**** org-super-agenda views
+Setup for org-super-agenda and org-ql.
+
+#+NAME::org-super-agenda
+#+BEGIN_SRC emacs-lisp
+  (use-package org-super-agenda
+    :after org-agenda
+    :init
+  (setq org-agenda-dim-blocked-tasks nil))
+  (setq org-super-agenda-groups '((:name "Important"
+                                          :priority "A")
+                                  (:name "This Week"
+                                          :deadline today)
+                                  (:name "Next Actions"
+                                          :todo "NEXT")))
 #+END_SRC
 
 *** UI improvements
