@@ -308,11 +308,6 @@ If you haven't heard of org mode, go watch [[https://www.youtube.com/watch?v=SzA
   ;; Fast access to tag common contexts I use
   (setq org-tag-persistent-alist '(("Inbox" . ?i) ("@Home" . ?h) ("@Amanda" . ?a) ("@Car" . ?c) ("@Office" . ?o) ("#Phone" . ?p) ("#Computer" . ?u)))
 
-  (setq org-agenda-custom-commands
-   '(("p" tags "PROJECT-SOMEDAY-DONE" nil)  ;; (1) Active Projects
-     ("m" tags "PROJECT&SOMEDAY" nil)       ;; (2) All Projects
-     ("d" tags "PROJECT&DONE" nil)))        ;; (3) Completed Projects
-
 #+END_SRC
 
 **** Install package
