@@ -178,26 +178,13 @@
   '(("TODO" . org-warning) ("NEXT" . "yellow")
     ("CANCELED" . (:foreground "blue" :weight bold))))
 
-(add-hook 'org-agenda-finalize-hook
-  (lambda ()
-    (save-excursion
-    (color-org-header "2021-08-01" "azure" "black")
-    (color-org-header "2021-08-05" "RosyBrown1" "red"))))
-
-(defun color-org-header (tag backcolor forecolor)
-  (interactive)
-  (goto-char (point-min))
-  (while (re-search-forward tag nil t)
-  (add-text-properties (match-beginning 0) (+ (match-beginning 0) 10)
-    `(face (:background, backcolor, :foreground, forecolor)))))
-
 ;; Fast access to tag common contexts I use
 (setq org-tag-persistent-alist '(("Inbox" . ?i) ("@Home" . ?h) ("@Amanda" . ?a) ("@Car" . ?c) ("@Office" . ?o) ("#Phone" . ?p) ("#Computer" . ?u)))
 
 (setq org-agenda-custom-commands
  '(("p" tags "PROJECT-SOMEDAY-DONE" nil)  ;; (1) Active Projects
    ("m" tags "PROJECT&SOMEDAY" nil)       ;; (2) All Projects
-   ("d" tags "PROJECT&DONE" nil)))          ;; (3) Completed Projects
+   ("d" tags "PROJECT&DONE" nil)))        ;; (3) Completed Projects
 
 (use-package org-roam
      :init
@@ -303,16 +290,16 @@ Note the weekly scope of the command's precision.")
     "%?"
     :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n\n")
     :unnarrowed t)
-   ("p" "project" plain
+   ("j" "project" plain
     "#+filetags: Project\n\n* Goals\n\n%^{Goals}\n\n* Tasks\n\n** TODO %?"
     :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}")
     :unnarrowed t)
-   ("e" "people" plain
-    "#+filetags: People CRM\n\nRelationship: %^{Relationship}\nPhone:\nAddress:\nBirthday:\n\n %?"
+   ("p" "people" plain
+    "#+filetags: People CRM\n\n* Contacts\n\nRelationship: %^{Relationship}\nPhone:\nAddress:\nBirthday:\n\n* Notes\n\n %?"
     :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}")
     :unnarrowed t)
    ("i" "institution" plain
-    "#+filetags: Institution CRM\n\nRelationship: %^{Relationship}\nPhone:\nAddress:\n\n %?"
+    "#+filetags: Institution CRM\n\n* Contacts\n\nRelationship: %^{Relationship}\nPhone:\nAddress:\n\n* Notes\n\n %?"
     :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}")
     :unnarrowed t)))
 
@@ -364,6 +351,27 @@ Note the weekly scope of the command's precision.")
         (todo . " %i %(dl/agenda-category 12) ")
         (tags . " %i %(dl/agenda-category 12) ")
         (search . " %i %(dl/agenda-category 12) ")))
+
+(use-package org-super-agenda
+   :after org-agenda
+   :init
+ (setq org-agenda-dim-blocked-tasks nil))
+
+ ;; Dashboard View
+ (setq org-super-agenda-groups
+      '((:name "Today"
+               :time-grid t  ; Items that appear on the time grid
+               :scheduled today)
+        (:name "Priority"
+               :priority "A")
+        (:name "Inbox"
+               :tag "Inbox")
+        (:name "Next Actions"
+               :todo "NEXT" :tag ("Active"))
+        (:name "Maintenance"
+               :todo "MAINTAIN")))
+
+ (org-super-agenda-mode)
 
 (use-package org-superstar
   :after org
@@ -567,7 +575,7 @@ Note the weekly scope of the command's precision.")
           list match menu move-to-prompt netsplit networks noncommands
           readonly ring stamp track image hl-nicks notify)))
 
-(setq org-src-tab-acts-natively t)
+(setq org-src-tab-acts-natively nil)
 
 ;; Gives me a fancy list of commands I run
 (use-package command-log-mode)
