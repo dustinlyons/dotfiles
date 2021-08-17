@@ -1,0 +1,22 @@
+toolbar#TabsToolbar, #nav-bar
+{
+    -moz-appearance: none !important;
+    background-color: #1F2528 !important;
+}
+.tabbrowser-tab:not([selected]):not([pinned]) .tab-close-button {
+  display: none !important;
+}
+
+.tab-background[selected="true"] {
+    background-color: #1F2528 !important;
+    background-image: none !important;
+}
+
+.tab-line[selected="true"] {
+      background-color: #EC5F67 !important;
+}
+
+#browser vbox#appcontent tabbrowser, #content, #tabbrowser-tabpanels, 
+browser[type=content-primary],browser[type=content] > html {
+    background: #1F2528 !important
+}

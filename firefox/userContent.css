@@ -1,0 +1,4 @@
+/*CHANGE NEW TAB BACKGROUND COLOUR*/
+@-moz-document url-prefix(about:blank), url-prefix(about:newtab), url(moz-extension://e9518bb3-7ffc-4260-bdc8-c62be69fbc68/redirect.html), url(moz-extension://67af9bc8-7ba8-4477-9afa-924b0139681a/html/newtab.html) {
+ body { background-color: #1F2528 !important;}
+}

@@ -1,0 +1,12 @@
+{
+    "coc.preferences.formatOnSaveFiletypes": [
+        "css", "python", "markdown", "javascript", "html"
+    ],
+    "cSpell.enabledLanguageIds": [
+        "markdown",
+        "plaintext"
+    ],
+    "python.jediEnabled": true,
+    "python.linting.mypyEnabled": true,
+    "python.linting.pylintArgs": ["--load-plugins", "pylint-flask"]
+}
