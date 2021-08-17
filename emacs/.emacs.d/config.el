@@ -37,6 +37,19 @@
 ;; as it's much easier to open it up and hack it
 (setq straight-use-package-by-default t)
 
+(use-package dashboard
+  :config
+  (dashboard-setup-startup-hook))
+
+  (setq dashboard-projects-backend 'projectile)
+  (setq dashboard-items '((projects . 5)
+                          (bookmarks . 5)
+                          (agenda . 5)))
+
+  (setq dashboard-set-heading-icons t)
+  (setq dashboard-set-file-icons t)
+  (setq dashboard-filter-agenda-entry 'dashboard-no-filter-agenda)
+
 ;; ESC will also cancel/quit/etc.
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 (use-package general
@@ -180,11 +193,6 @@
 
 ;; Fast access to tag common contexts I use
 (setq org-tag-persistent-alist '(("Inbox" . ?i) ("@Home" . ?h) ("@Amanda" . ?a) ("@Car" . ?c) ("@Office" . ?o) ("#Phone" . ?p) ("#Computer" . ?u)))
-
-(setq org-agenda-custom-commands
- '(("p" tags "PROJECT-SOMEDAY-DONE" nil)  ;; (1) Active Projects
-   ("m" tags "PROJECT&SOMEDAY" nil)       ;; (2) All Projects
-   ("d" tags "PROJECT&DONE" nil)))        ;; (3) Completed Projects
 
 (use-package org-roam
      :init
@@ -347,10 +355,10 @@ Note the weekly scope of the command's precision.")
       result)))
 
 (setq org-agenda-prefix-format
-      '((agenda . " %i %(dl/agenda-category 12)%?-12t% s")
-        (todo . " %i %(dl/agenda-category 12) ")
-        (tags . " %i %(dl/agenda-category 12) ")
-        (search . " %i %(dl/agenda-category 12) ")))
+      '((agenda . " %i %(dl/agenda-category 32)%?-32t% s")
+        (todo . " %i %(dl/agenda-category 32) ")
+        (tags . " %i %(dl/agenda-category 32) ")
+        (search . " %i %(dl/agenda-category 32) ")))
 
 (use-package org-super-agenda
    :after org-agenda
@@ -359,15 +367,16 @@ Note the weekly scope of the command's precision.")
 
  ;; Dashboard View
  (setq org-super-agenda-groups
-      '((:name "Today"
-               :time-grid t  ; Items that appear on the time grid
-               :scheduled today)
-        (:name "Priority"
+      '((:name "Priority"
                :priority "A")
         (:name "Inbox"
                :tag "Inbox")
         (:name "Next Actions"
                :todo "NEXT" :tag ("Active"))
+        (:name "Waiting"
+               :todo "WAITING")
+        (:name "Someday"
+               :todo "SOMEDAY")
         (:name "Maintenance"
                :todo "MAINTAIN")))
 

@@ -74,6 +74,23 @@ Straight.el fetchs packages over git via use-package.
   (setq straight-use-package-by-default t)
 #+END_SRC
 
+*** Dashboard
+#+NAME: straight-el
+#+BEGIN_SRC emacs-lisp
+(use-package dashboard
+  :config
+  (dashboard-setup-startup-hook))
+
+  (setq dashboard-projects-backend 'projectile)
+  (setq dashboard-items '((projects . 5)
+                          (bookmarks . 5)
+                          (agenda . 5)))
+
+  (setq dashboard-set-heading-icons t)
+  (setq dashboard-set-file-icons t)
+  (setq dashboard-filter-agenda-entry 'dashboard-no-filter-agenda)
+#+END_SRC
+
 ** Keybindings
 *** Leader keys
 I use general.el to define groups of keybindings under my 'leader' definition. You will see these definitions sprinkled throughout this file; my own private collection of fast shit. For more info, [[https://medium.com/usevim/vim-101-what-is-the-leader-key-f2f5c1fa610f][here]] is a good explanation on leader keys.
