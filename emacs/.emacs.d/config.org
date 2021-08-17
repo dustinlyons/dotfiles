@@ -305,30 +305,11 @@ If you haven't heard of org mode, go watch [[https://www.youtube.com/watch?v=SzA
     '(("TODO" . org-warning) ("NEXT" . "yellow")
       ("CANCELED" . (:foreground "blue" :weight bold))))
 
-  (add-hook 'org-agenda-finalize-hook
-    (lambda ()
-      (save-excursion
-      (color-org-header "2021-08-01" "azure" "black")
-      (color-org-header "2021-08-05" "RosyBrown1" "red"))))
-
-  (defun color-org-header (tag backcolor forecolor)
-    (interactive)
-    (goto-char (point-min))
-    (while (re-search-forward tag nil t)
-    (add-text-properties (match-beginning 0) (+ (match-beginning 0) 10)
-      `(face (:background, backcolor, :foreground, forecolor)))))
-
   ;; Fast access to tag common contexts I use
-  (setq org-tag-persistent-alist '(("@inbox" . ?i) ("@home" . ?h) ("@errands" . ?e) ("@office" . ?o) ("@phone" . ?p) ("@computer" . ?c) ("@amanda" . ?a) ("@someday" . ?s)))
-
-  (setq org-agenda-custom-commands
-   '(("p" tags "PROJECT-SOMEDAY-DONE" nil)  ;; (1) Active Projects
-     ("m" tags "PROJECT&SOMEDAY" nil)       ;; (2) All Projects
-     ("d" tags "PROJECT&DONE" nil)))          ;; (3) Completed Projects
+  (setq org-tag-persistent-alist '(("Inbox" . ?i) ("@Home" . ?h) ("@Amanda" . ?a) ("@Car" . ?c) ("@Office" . ?o) ("#Phone" . ?p) ("#Computer" . ?u)))
 
 #+END_SRC
 
-*** Roam
 **** Install package
 #+NAME::org-roam-package
 #+BEGIN_SRC emacs-lisp
@@ -467,16 +448,16 @@ These are templates used to create new notes.
       "%?"
       :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n\n")
       :unnarrowed t)
-     ("p" "project" plain
+     ("j" "project" plain
       "#+filetags: Project\n\n* Goals\n\n%^{Goals}\n\n* Tasks\n\n** TODO %?"
       :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}")
       :unnarrowed t)
-     ("e" "people" plain
-      "#+filetags: People CRM\n\nRelationship: %^{Relationship}\nPhone:\nAddress:\nBirthday:\n\n %?"
+     ("p" "people" plain
+      "#+filetags: People CRM\n\n* Contacts\n\nRelationship: %^{Relationship}\nPhone:\nAddress:\nBirthday:\n\n* Notes\n\n %?"
       :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}")
       :unnarrowed t)
      ("i" "institution" plain
-      "#+filetags: Institution CRM\n\nRelationship: %^{Relationship}\nPhone:\nAddress:\n\n %?"
+      "#+filetags: Institution CRM\n\n* Contacts\n\nRelationship: %^{Relationship}\nPhone:\nAddress:\n\n* Notes\n\n %?"
       :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}")
       :unnarrowed t)))
 #+END_SRC
@@ -538,10 +519,38 @@ This block sets the ~org-agenda-prefix-format~ in an friendly way for org-roam (
         result)))
 
   (setq org-agenda-prefix-format
-        '((agenda . " %i %(dl/agenda-category 12)%?-12t% s")
-          (todo . " %i %(dl/agenda-category 12) ")
-          (tags . " %i %(dl/agenda-category 12) ")
-          (search . " %i %(dl/agenda-category 12) ")))
+        '((agenda . " %i %(dl/agenda-category 32)%?-32t% s")
+          (todo . " %i %(dl/agenda-category 32) ")
+          (tags . " %i %(dl/agenda-category 32) ")
+          (search . " %i %(dl/agenda-category 32) ")))
+#+END_SRC
+
+**** org-super-agenda views
+Setup for org-super-agenda and org-ql.
+
+#+NAME::org-super-agenda
+#+BEGIN_SRC emacs-lisp
+    (use-package org-super-agenda
+       :after org-agenda
+       :init
+     (setq org-agenda-dim-blocked-tasks nil))
+
+     ;; Dashboard View
+     (setq org-super-agenda-groups
+          '((:name "Priority"
+                   :priority "A")
+            (:name "Inbox"
+                   :tag "Inbox")
+            (:name "Next Actions"
+                   :todo "NEXT" :tag ("Active"))
+            (:name "Waiting"
+                   :todo "WAITING")
+            (:name "Someday"
+                   :todo "SOMEDAY")
+            (:name "Maintenance"
+                   :todo "MAINTAIN")))
+
+     (org-super-agenda-mode)
 #+END_SRC
 
 *** UI improvements
@@ -813,7 +822,7 @@ These packages may come and go, but ultimately aid in my understanding of emacs 
 
 *** Indent org-babel source blocks
 #+BEGIN_SRC emacs-lisp 
-  (setq org-src-tab-acts-natively t)
+  (setq org-src-tab-acts-natively nil)
 #+END_SRC
 
 *** Show real time key bindings in a seperate buffer
