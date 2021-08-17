@@ -20,7 +20,7 @@ feh --no-fehbg --bg-scale $(shuf -n1 -e /home/dustin/images/wallpaper/active/*)
 dwall -s forest &
 
 ## Keymaps
-xmodmap ~/.Xmodmap
+xmodmap ~/.Xmodmap &
 
 ## Notification Daemon
 exec dunst &
