@@ -79,7 +79,7 @@
 
 ;; Set the variable pitch face
 (set-face-attribute 'variable-pitch nil
-  :font "Helvetica"
+  :font "Fira Sans"
   :height 165)
 
 (global-linum-mode 1)
@@ -192,12 +192,12 @@
     ("CANCELED" . (:foreground "blue" :weight bold))))
 
 ;; Fast access to tag common contexts I use
-(setq org-tag-persistent-alist '(("Inbox" . ?i) ("@Home" . ?h) ("@Amanda" . ?a) ("@Car" . ?c) ("@Office" . ?o) ("#Phone" . ?p) ("#Computer" . ?u)))
+(setq org-tag-persistent-alist '(("Inbox" . ?i) ("@Home" . ?h) ("@Amanda" . ?a)("@Justin" . ?j)  ("@Car" . ?c) ("@Office" . ?o) ("#Phone" . ?p) ("#Computer" . ?u)))
 
 (use-package org-roam
      :init
        (setq org-roam-v2-ack t) ;; Turn off v2 warning
-       (org-roam-setup)
+       (org-roam-db-autosync-mode)
        (add-to-list 'display-buffer-alist
            '("\\*org-roam\\*"
              (display-buffer-in-direction)
@@ -218,6 +218,7 @@
         ("C-M-f" . org-roam-node-find)
         ("C-M-c" . dl/org-roam-create-id)
         ("C-<left>" . org-roam-dailies-goto-previous-note)
+        ("C-`" . org-roam-buffer-toggle)
         ("C-<right>" . org-roam-dailies-goto-next-note)))
 
 (setq org-roam-dailies-capture-templates
@@ -298,6 +299,10 @@ Note the weekly scope of the command's precision.")
     "%?"
     :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n\n")
     :unnarrowed t)
+   ("a" "area" plain
+    "#+filetags: Area\n\n* Goals\n\n%^{Goals}\n\n* Tasks\n\n** TODO %?"
+    :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}")
+    :unnarrowed t)
    ("j" "project" plain
     "#+filetags: Project\n\n* Goals\n\n%^{Goals}\n\n* Tasks\n\n** TODO %?"
     :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}")
@@ -312,6 +317,7 @@ Note the weekly scope of the command's precision.")
     :unnarrowed t)))
 
 (defun dl/define-agenda-files ()
+(interactive)
   "Return a list of note files containing 'HasTodo' tag. 
    I use this to denote files with tasks for org-agenda" ;
   (seq-uniq
@@ -322,10 +328,13 @@ Note the weekly scope of the command's precision.")
       :from tags
       :left-join nodes
       :on (= tags:node-id nodes:id)
-      :where (in tag $v1)] '(["Project" "Daily"])))))
+      :where (in tag $v1)] '(["Project" "Area" "Daily"])))))
 
 ;; Roam Daily Log and Project Files only
  (setq org-agenda-files (dl/define-agenda-files))
+
+(dl/leader-keys
+  "a"  '(dl/define-agenda-files :which-key "refresh agenda db"))
 
 (defun dl/buffer-prop-get (name)
   "Get a buffer property called NAME as a string."
@@ -370,7 +379,7 @@ Note the weekly scope of the command's precision.")
       '((:name "Priority"
                :priority "A")
         (:name "Inbox"
-               :tag "Inbox")
+               :tag ("Inbox" "Daily"))
         (:name "Next Actions"
                :todo "NEXT" :tag ("Active"))
         (:name "Waiting"
@@ -548,41 +557,6 @@ Note the weekly scope of the command's precision.")
     ("\\.md\\'" . markdown-mode)
     ("\\.markdown\\'" . markdown-mode))
   :init (setq markdown-command "multimarkdown"))
-
-(use-package erc-hl-nicks
-  :after erc)
-
-(use-package erc-image
-  :after erc)
-
-(use-package erc
-  :commands erc
-  :config
-  (setq
-      erc-nick "dlyons"
-      erc-user-full-name "Dustin Lyons"
-      erc-prompt-for-password nil
-      erc-auto-query 'bury
-      erc-join-buffer 'bury
-      erc-track-shorten-start 8
-      erc-interpret-mirc-color t
-      erc-rename-buffers t
-      erc-kill-buffer-on-part t
-      erc-track-exclude-types '("JOIN" "NICK" "PART" "QUIT" "MODE" "AWAY")
-      erc-track-enable-keybindings nil
-      erc-track-visibility nil ; Only use the selected frame for visibility
-      erc-track-exclude-server-buffer t
-      erc-fill-column 120
-      erc-fill-function 'erc-fill-static
-      erc-fill-static-center 20
-      erc-image-inline-rescale 400
-      erc-server-reconnect-timeout 5
-      erc-server-reconnect-attempts 3
-      erc-autojoin-channels-alist '(("irc.libera.chat" "#systemcrafters" "#emacs" "#guix"))
-      erc-modules
-      '(autoaway autojoin button completion fill irccontrols keep-place
-          list match menu move-to-prompt netsplit networks noncommands
-          readonly ring stamp track image hl-nicks notify)))
 
 (setq org-src-tab-acts-natively nil)
 
