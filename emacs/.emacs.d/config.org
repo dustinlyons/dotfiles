@@ -310,7 +310,6 @@ If you haven't heard of org mode, go watch [[https://www.youtube.com/watch?v=SzA
           (("C-c a" . org-agenda)))
   (setq org-todo-keywords
      '((sequence "TODO(t)"
-                 "MAINTAIN(m)"
                  "NEXT(n)"
                  "WAITING(w)"
                  "SOMEDAY(s)"
