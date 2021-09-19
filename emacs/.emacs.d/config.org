@@ -258,8 +258,6 @@ Predefine windows with hotkeys and jump to them.
     (ace-window-display-mode 1))
 #+END_SRC
 
-y window motions
-
 **** "Powerline"
 Keeps info at my fingertips. Modeline is much better than Vim's Powerline (sorry Vim).
 
@@ -272,6 +270,21 @@ Keeps info at my fingertips. Modeline is much better than Vim's Powerline (sorry
     :init (doom-modeline-mode 1))
 #+END_SRC
 
+**** Rotate windows
+Various helpers and packages I find useful for window management.
+
+#+BEGIN_SRC emacs-lisp
+
+  ;; Rotates windows and layouts
+  (use-package rotate
+    :config)
+
+  (dl/leader-keys
+    "r"  '(:ignore t :which-key "rotate")
+    "rw"  '(rotate-window :which-key "rotate window")
+    "rl"  '(rotate-layout :which-key "rotate layout"))
+
+#+END_SRC
 ** Global setings and config
 ***  Global modes
 I like these modes, what can I say.
@@ -695,23 +708,6 @@ This is what makes emacs possible for me. All evil mode packages and related con
       :config
       (evil-set-undo-system 'undo-tree)
       (global-undo-tree-mode 1))
-
-#+END_SRC
-
-** Utility packages and functions
-Various helpers and packages I find useful.
-
-*** Rotate
-#+BEGIN_SRC emacs-lisp
-
-  ;; Rotates windows and layouts
-  (use-package rotate
-    :config)
-
-  (dl/leader-keys
-    "r"  '(:ignore t :which-key "rotate")
-    "rw"  '(rotate-window :which-key "rotate window")
-    "rl"  '(rotate-layout :which-key "rotate layout"))
 
 #+END_SRC
 
