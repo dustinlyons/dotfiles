@@ -220,6 +220,7 @@ I like these window related minor modes.
   (scroll-bar-mode -1)
   (menu-bar-mode -1)
   (tool-bar-mode -1)
+  (winner-mode 1) ;; ctrl-c left, ctrl-c right for window undo/redo
 #+END_SRC
 
 ***** Rainbow delmiters
