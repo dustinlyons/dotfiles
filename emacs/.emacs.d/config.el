@@ -126,9 +126,20 @@
 (scroll-bar-mode -1)
 (menu-bar-mode -1)
 (tool-bar-mode -1)
+(winner-mode 1) ;; ctrl-c left, ctrl-c right for window undo/redo
 
 (use-package rainbow-delimiters
   :hook (prog-mode . rainbow-delimiters-mode))
+
+(defvar dl/red-color "#EC5F67")
+(defvar dl/green-color "#99C794")
+(defvar dl/yellow-color "#FAC863")
+(defvar dl/blue-color "#6699CC")
+(defvar dl/purple-color "#C594C5")
+(defvar dl/teal-color "#5FB3B3")
+(defvar dl/black-color "#1F2528")
+(defvar dl/light-grey-color "#C0C5CE")
+(defvar dl/dark-grey-color "#65737E")
 
 (defun dl/org-mode-visual-fill ()
   (setq visual-fill-column-width 110
@@ -154,6 +165,15 @@
   :ensure t
   :init (doom-modeline-mode 1))
 
+;; Rotates windows and layouts
+(use-package rotate
+  :config)
+
+(dl/leader-keys
+  "r"  '(:ignore t :which-key "rotate")
+  "rw"  '(rotate-window :which-key "rotate window")
+  "rl"  '(rotate-layout :which-key "rotate layout"))
+
 (defalias 'yes-or-no-p 'y-or-n-p) ;; Use Y or N in prompts, instead of full Yes or No
 
 (global-visual-line-mode t) ;; Wraps lines everywhere
@@ -177,9 +197,9 @@
         org-hide-block-startup nil) ;; Don't start org mode with blocks folded
   :bind
         (("C-c a" . org-agenda)))
+
 (setq org-todo-keywords
    '((sequence "TODO(t)"
-               "MAINTAIN(m)"
                "NEXT(n)"
                "WAITING(w)"
                "SOMEDAY(s)"
@@ -187,12 +207,18 @@
                "CANCELED(c)"
                "DONE(d)")))
 
-(setq org-todo-keyword-faces
-  '(("TODO" . org-warning) ("NEXT" . "yellow")
-    ("CANCELED" . (:foreground "blue" :weight bold))))
-
 ;; Fast access to tag common contexts I use
-(setq org-tag-persistent-alist '(("Inbox" . ?i) ("@Home" . ?h) ("@Amanda" . ?a)("@Justin" . ?j)  ("@Car" . ?c) ("@Office" . ?o) ("#Phone" . ?p) ("#Computer" . ?u)))
+(setq org-tag-persistent-alist
+  '(("Inbox" . ?i) ("@Home" . ?h) ("@Amanda" . ?a)("@Justin" . ?j)
+   ("@Car" . ?c) ("@Office" . ?o) ("#Phone" . ?p) ("#Computer" . ?u)))
+
+(setq org-todo-keyword-faces
+  `(("NEXT" . ,dl/yellow-color)
+   ("WAITING" . ,dl/blue-color)))
+
+(setq org-tag-faces
+  `(("@Home" . ,dl/red-color)
+   ("@Car" . ,dl/blue-color)))
 
 (use-package org-roam
      :init
@@ -380,14 +406,30 @@ Note the weekly scope of the command's precision.")
                :priority "A")
         (:name "Inbox"
                :tag ("Inbox" "Daily"))
-        (:name "Next Actions"
-               :todo "NEXT" :tag ("Active"))
+        (:name "Next Actions at Office"
+               :and (
+               :todo ("NEXT")
+               :tag ("Active")
+               :tag ("@Office")))
+        (:name "Next Actions at Home"
+               :and (
+               :todo ("NEXT")
+               :tag ("Active")
+               :tag ("@Home")))
         (:name "Waiting"
                :todo "WAITING")
-        (:name "Someday"
-               :todo "SOMEDAY")
         (:name "Maintenance"
-               :todo "MAINTAIN")))
+               :todo "MAINTAIN")
+        (:name "Home"
+               :tag "@Home")
+        (:name "Office"
+               :tag "@Office")
+        (:name "Braeview"
+               :tag "Braeview")
+        (:name "Productivity"
+               :tag "Productivity")
+        (:name "Someday"
+               :todo "SOMEDAY")))
 
  (org-super-agenda-mode)
 
@@ -396,7 +438,7 @@ Note the weekly scope of the command's precision.")
   :hook (org-mode . org-superstar-mode)
   :custom
     (org-superstar-remove-leading-stars t)
-    (org-superstar-headline-bullets-list '("◉" "○" "●" "○" "▷" "▷" "▷")))
+    (org-superstar-headline-bullets-list '("•" "•" "•" "◦" "◦" "◦" "◦")))
 
 ;; Not sure why this is needed, but the org-indent face "requires" it (pun)
 (require 'org-indent)
@@ -473,15 +515,6 @@ Note the weekly scope of the command's precision.")
   (evil-set-undo-system 'undo-tree)
   (global-undo-tree-mode 1))
 
-;; Rotates windows and layouts
-(use-package rotate
-  :config)
-
-(dl/leader-keys
-  "r"  '(:ignore t :which-key "rotate")
-  "rw"  '(rotate-window :which-key "rotate window")
-  "rl"  '(rotate-layout :which-key "rotate layout"))
-
 (let ((code_dir_path '"\"~/Projects/Code\""))
 (use-package projectile
   :diminish projectile-mode
@@ -527,12 +560,16 @@ Note the weekly scope of the command's precision.")
 	 ("C-k" . ivy-previous-line)
 	 ("C-d" . ivy-reverse-i-search-kill))
   :init
-  (ivy-mode 1)
+    (ivy-mode 1)
   :config
   (setq ivy-use-virtual-buffers t)
   (setq ivy-wrap t)
   (setq ivy-count-format "(%d/%d) ")
   (setq enable-recursive-minibuffers t))
+
+(use-package ivy-rich
+  :init
+  (ivy-rich-mode 1))
 
 (use-package counsel
   :demand t
@@ -546,6 +583,34 @@ Note the weekly scope of the command's precision.")
   (counsel-linux-app-format-function #'counsel-linux-app-format-function-name-only)
   :config
   (setq ivy-initial-inputs-alist nil)) ;; Don't start searches with ^
+
+;; Auto complete HTML and CSS tags
+(use-package emmet-mode)
+(add-hook 'sgml-mode-hook 'emmet-mode) ;; Auto-start on any markup modes
+(add-hook 'css-mode-hook  'emmet-mode) ;; enable Emmet's css abbreviation.
+
+;; Minor mode to show HTML hex colors
+(use-package rainbow-mode)
+
+(use-package lsp-mode
+  :commands lsp lsp-deferred
+  :init
+  (setq lsp-keymap-prefix "C-c l")
+  :config
+  (lsp-enable-which-key-integration t))
+
+(use-package company-lsp
+  :after lsp-mode
+  :config (push 'company-lsp company-backends))
+
+(use-package company-box
+  :hook (company-mode . company-box-mode))
+
+(use-package typescript-mode
+  :mode "\\.ts\\'"
+  :hook (typescript-mode . lsp-deferred)
+  :config
+  (setq typescript-indent-level 2))
 
 (use-package magit
   :commands (magit-status magit-get-current-branch))
