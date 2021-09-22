@@ -131,13 +131,13 @@
 (use-package rainbow-delimiters
   :hook (prog-mode . rainbow-delimiters-mode))
 
+(defvar dl/black-color "#1F2528")
 (defvar dl/red-color "#EC5F67")
-(defvar dl/green-color "#99C794")
 (defvar dl/yellow-color "#FAC863")
 (defvar dl/blue-color "#6699CC")
+(defvar dl/green-color "#99C794")
 (defvar dl/purple-color "#C594C5")
 (defvar dl/teal-color "#5FB3B3")
-(defvar dl/black-color "#1F2528")
 (defvar dl/light-grey-color "#C0C5CE")
 (defvar dl/dark-grey-color "#65737E")
 
@@ -214,11 +214,16 @@
 
 (setq org-todo-keyword-faces
   `(("NEXT" . ,dl/yellow-color)
-   ("WAITING" . ,dl/blue-color)))
+   ("WAITING" . ,dl/light-grey-color)
+   ("SOMEDAY" . ,dl/dark-grey-color)))
 
 (setq org-tag-faces
-  `(("@Home" . ,dl/red-color)
-   ("@Car" . ,dl/blue-color)))
+  `(("@Home" . ,dl/green-color)
+   ("@Car" . ,dl/purple-color)
+   ("@Office" . ,dl/teal-color)
+   ("Inbox" . ,dl/blue-color)
+
+   ))
 
 (use-package org-roam
      :init
@@ -599,9 +604,27 @@ Note the weekly scope of the command's precision.")
   :config
   (lsp-enable-which-key-integration t))
 
-(use-package company-lsp
+(use-package lsp-ui
+  :hook (lsp-mode . lsp-ui-mode)
+  :custom
+  (lsp-ui-doc-position 'bottom))
+
+(use-package lsp-grammarly
+  :ensure t
+  :hook (text-mode . (lambda ()
+                       (require 'lsp-grammarly)
+                       (lsp))))  ; or lsp-deferred
+
+(use-package company
   :after lsp-mode
-  :config (push 'company-lsp company-backends))
+  :hook (lsp-mode . company-mode)
+  :bind (:map company-active-map
+        ("<tab>" . company-complete-selection))
+        (:map lsp-mode-map
+        ("<tab>" . company-indent-or-complete-common))
+   :custom
+     (company-minimum-prefix-length 1)
+     (company-idle-delay 0.0))
 
 (use-package company-box
   :hook (company-mode . company-box-mode))
