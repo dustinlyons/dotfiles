@@ -853,19 +853,19 @@ Rainbow mode is an Emacs minor mode to highlight the color shown by a RGB hex tr
     :commands lsp lsp-deferred
     :init
     (setq lsp-keymap-prefix "C-c l")
-    :config
-    (lsp-enable-which-key-integration t))
+    (setq lsp-enable-which-key-integration t))
 
   (use-package lsp-ui
     :hook (lsp-mode . lsp-ui-mode)
     :custom
-    (lsp-ui-doc-position 'bottom))
+      (lsp-ui-doc-position 'bottom))
 
+  (use-package keytar) ;; M-x install-keytar
   (use-package lsp-grammarly
     :ensure t
     :hook (text-mode . (lambda ()
                          (require 'lsp-grammarly)
-                         (lsp))))  ; or lsp-deferred
+                         (lsp-deferred))))
 
   (use-package company
     :after lsp-mode
@@ -916,7 +916,7 @@ These packages may come and go, but ultimately aid in my understanding of emacs 
   (setq org-src-tab-acts-natively nil)
 #+END_SRC
 
-*** Show real time key bindings in a seperate buffer
+*** Show real-time key bindings in a separate buffer
 #+NAME: command-log
 #+BEGIN_SRC emacs-lisp 
   ;; Gives me a fancy list of commands I run
