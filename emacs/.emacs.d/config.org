@@ -155,7 +155,7 @@ Turns off the various menu bars, they're quite ugly.
 
   ;; Set the variable pitch face
   (set-face-attribute 'variable-pitch nil
-    :font "Fira Sans"
+    :font "Helvetica"
     :height 165)
 #+END_SRC
 
@@ -371,15 +371,17 @@ If you haven't heard of org mode, go watch [[https://www.youtube.com/watch?v=SzA
 #+NAME::org-roam-package
 #+BEGIN_SRC emacs-lisp
   (use-package org-roam
+        :straight (:host github :repo "org-roam/org-roam"
+        :files (:defaults "extensions/*"))
        :init
          (setq org-roam-v2-ack t) ;; Turn off v2 warning
-         (org-roam-db-autosync-mode)
          (add-to-list 'display-buffer-alist
              '("\\*org-roam\\*"
                (display-buffer-in-direction)
                (direction . right)
                (window-width . 0.33)
                (window-height . fit-window-to-buffer)))
+         (org-roam-db-autosync-mode)
        :custom
          (org-roam-directory (file-truename "~/Projects/Writing/Roam/"))
          (org-roam-dailies-directory "daily/")
@@ -396,6 +398,7 @@ If you haven't heard of org mode, go watch [[https://www.youtube.com/watch?v=SzA
           ("C-<left>" . org-roam-dailies-goto-previous-note)
           ("C-`" . org-roam-buffer-toggle)
           ("C-<right>" . org-roam-dailies-goto-next-note)))
+
 #+END_SRC
 
 **** Configure templates
@@ -860,12 +863,12 @@ Rainbow mode is an Emacs minor mode to highlight the color shown by a RGB hex tr
     :custom
       (lsp-ui-doc-position 'bottom))
 
-  (use-package keytar) ;; M-x install-keytar
-  (use-package lsp-grammarly
-    :ensure t
-    :hook (text-mode . (lambda ()
-                         (require 'lsp-grammarly)
-                         (lsp-deferred))))
+  ;;(use-package keytar) ;; M-x install-keytar
+  ;;(use-package lsp-grammarly
+  ;;  :ensure t
+  ;;  :hook (text-mode . (lambda ()
+  ;;                       (require 'lsp-grammarly)
+  ;;                       (lsp-deferred))))
 
   (use-package company
     :after lsp-mode
@@ -886,6 +889,8 @@ Rainbow mode is an Emacs minor mode to highlight the color shown by a RGB hex tr
     :hook (typescript-mode . lsp-deferred)
     :config
     (setq typescript-indent-level 2))
+
+  ;;(add-to-list 'lsp-language-id-configuration '(org-mode . "plaintext"))
 #+END_SRC
 
 ** Git

@@ -79,7 +79,7 @@
 
 ;; Set the variable pitch face
 (set-face-attribute 'variable-pitch nil
-  :font "Fira Sans"
+  :font "Helvetica"
   :height 165)
 
 (global-linum-mode 1)
@@ -226,15 +226,17 @@
    ))
 
 (use-package org-roam
+      :straight (:host github :repo "org-roam/org-roam"
+      :files (:defaults "extensions/*"))
      :init
        (setq org-roam-v2-ack t) ;; Turn off v2 warning
-       (org-roam-db-autosync-mode)
        (add-to-list 'display-buffer-alist
            '("\\*org-roam\\*"
              (display-buffer-in-direction)
              (direction . right)
              (window-width . 0.33)
              (window-height . fit-window-to-buffer)))
+       (org-roam-db-autosync-mode)
      :custom
        (org-roam-directory (file-truename "~/Projects/Writing/Roam/"))
        (org-roam-dailies-directory "daily/")
@@ -601,19 +603,19 @@ Note the weekly scope of the command's precision.")
   :commands lsp lsp-deferred
   :init
   (setq lsp-keymap-prefix "C-c l")
-  :config
-  (lsp-enable-which-key-integration t))
+  (setq lsp-enable-which-key-integration t))
 
 (use-package lsp-ui
   :hook (lsp-mode . lsp-ui-mode)
   :custom
-  (lsp-ui-doc-position 'bottom))
+    (lsp-ui-doc-position 'bottom))
 
-(use-package lsp-grammarly
-  :ensure t
-  :hook (text-mode . (lambda ()
-                       (require 'lsp-grammarly)
-                       (lsp))))  ; or lsp-deferred
+;;(use-package keytar) ;; M-x install-keytar
+;;(use-package lsp-grammarly
+;;  :ensure t
+;;  :hook (text-mode . (lambda ()
+;;                       (require 'lsp-grammarly)
+;;                       (lsp-deferred))))
 
 (use-package company
   :after lsp-mode
@@ -634,6 +636,8 @@ Note the weekly scope of the command's precision.")
   :hook (typescript-mode . lsp-deferred)
   :config
   (setq typescript-indent-level 2))
+
+;;(add-to-list 'lsp-language-id-configuration '(org-mode . "plaintext"))
 
 (use-package magit
   :commands (magit-status magit-get-current-branch))
