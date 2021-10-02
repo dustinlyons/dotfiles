@@ -2,7 +2,7 @@
 sh ~/.config/polybar/launch.sh
 
 ## Spotify daemon
-spotifyd
+## spotifyd
 
 ## Fix tearing issues
 nvidia-settings --assign CurrentMetaMode="nvidia-auto-select +0+0 { ForceFullCompositionPipeline = On }"
@@ -14,19 +14,16 @@ ntpdate -u us.pool.ntp.org
 exec thunar --daemon &
 
 ## Feh wallpaper
-feh --no-fehbg --bg-scale $(shuf -n1 -e /home/dustin/images/wallpaper/active/*)
-
-## Dwall wallpaper
-dwall -s forest &
+feh --no-fehbg --bg-scale $(shuf -n1 -e /data/dustin/Resources/wallpaper/active/*)
 
 ## Keymaps
-xmodmap ~/.Xmodmap &
+#xmodmap ~/.Xmodmap &
 
 ## Notification Daemon
 exec dunst &
 
 ## Turn on le screensaver
-xscreensaver -no-splash &
+#xscreensaver -no-splash &
 
 ## Start Compositing Manager
 picom --xrender-sync-fence --backend xrender --config=/home/dustin/.config/picom/picom.conf
