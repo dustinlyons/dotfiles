@@ -753,6 +753,21 @@ Projectile enables me organize projects with a killer grep interface.
 ** Managing files
 Configuration related to filesystem, either basic IO and interaction from emacs or directly moving files around where it makes sense.
 
+*** Code blocks
+org-tempo enables us to type ~<el~ [TAB]... and have an emacs-lisp block template (or other language) injected into the page.
+
+#+NAME: code-blocks
+#+BEGIN_SRC emacs-lisp
+  (require 'org-tempo)
+  (add-to-list 'org-structure-template-alist '("sh" . "src sh"))
+  (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
+  (add-to-list 'org-structure-template-alist '("sc" . "src scheme"))
+  (add-to-list 'org-structure-template-alist '("ts" . "src typescript"))
+  (add-to-list 'org-structure-template-alist '("py" . "src python"))
+  (add-to-list 'org-structure-template-alist '("toml" . "src toml"))
+  (add-to-list 'org-structure-template-alist '("json" . "src json"))
+#+END_SRC
+
 *** Backups and auto-save
 These settings keep emacs from littering the filesystem with buffer backups. These files look like ~~yourfilename.txt~ or ~#yourfilename.txt#~ and would otherwise be dropped in your working directory.
 
