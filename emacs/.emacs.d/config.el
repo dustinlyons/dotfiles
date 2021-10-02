@@ -13,6 +13,7 @@
 
 ;; use-package package provides common package import functions
 (unless (package-installed-p 'use-package)
+  (package-initialize)
   (package-install 'use-package))
 (setq use-package-verbose t)
 (setq use-package-always-ensure t)
@@ -37,19 +38,6 @@
 ;; as it's much easier to open it up and hack it
 (setq straight-use-package-by-default t)
 
-(use-package dashboard
-  :config
-  (dashboard-setup-startup-hook))
-
-  (setq dashboard-projects-backend 'projectile)
-  (setq dashboard-items '((projects . 5)
-                          (bookmarks . 5)
-                          (agenda . 5)))
-
-  (setq dashboard-set-heading-icons t)
-  (setq dashboard-set-file-icons t)
-  (setq dashboard-filter-agenda-entry 'dashboard-no-filter-agenda)
-
 ;; ESC will also cancel/quit/etc.
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 (use-package general
@@ -61,26 +49,26 @@
 
 (use-package hydra)
 
-(use-package doom-themes
-  :init (load-theme 'doom-nord t))
+(use-package autothemer
+  :init (load-theme 'zeroed t))
 
 (setq use-dialog-box nil
     use-file-dialog nil
     cursor-type 'bar)
 
 ;; Set the default pitch face
-(set-face-attribute 'default nil :font "Hack" :height 140)
+(set-face-attribute 'default nil :font "Hack" :height 100)
 
 ;; Set the fixed pitch face
 (set-face-attribute 'fixed-pitch nil
   :font "Hack"
   :weight 'light
-  :height 140)
+  :height 100)
 
 ;; Set the variable pitch face
 (set-face-attribute 'variable-pitch nil
-  :font "Helvetica"
-  :height 165)
+  :font "Helvetica LT Std"
+  :height 120)
 
 (global-linum-mode 1)
 (defvar my-linum-current-line-number 0)
@@ -238,7 +226,7 @@
              (window-height . fit-window-to-buffer)))
        (org-roam-db-autosync-mode)
      :custom
-       (org-roam-directory (file-truename "~/Projects/Writing/Roam/"))
+       (org-roam-directory (file-truename "/state/dustin/Writing/roam/"))
        (org-roam-dailies-directory "daily/")
        (org-roam-completion-everywhere t)
      :bind
@@ -460,7 +448,7 @@ Note the weekly scope of the command's precision.")
 (set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
 (set-face-attribute 'org-checkbox nil :inherit 'fixed-pitch)
 
-(set-face-attribute 'org-document-title nil :font "SF Pro Display" :weight 'bold :height 1.2)
+(set-face-attribute 'org-document-title nil :font "Helvetica LT Std" :weight 'bold :height 1.2)
 (dolist (face '((org-level-1 . 1.2)
                 (org-level-2 . 1.15)
                 (org-level-3 . 1.1)
@@ -469,7 +457,7 @@ Note the weekly scope of the command's precision.")
                 (org-level-6 . 1.0)
                 (org-level-7 . 1.0)
                 (org-level-8 . 1.0)))
-  (set-face-attribute (car face) nil :font "SF Pro Display" :weight 'medium :height (cdr face)))
+  (set-face-attribute (car face) nil :font "Helvetica LT Std" :weight 'medium :height (cdr face)))
 
 (defun dl/evil-hook ()
   (dolist (mode '(eshell-mode
